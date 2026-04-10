@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>世界旅行 ベストシーズンカレンダー</title>
+  <style>
+    :root {
+      --best: #2ecc71;
+      --good: #f1c40f;
+      --avoid: #e74c3c;
+      --neutral: #ecf0f1;
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --header-bg: #1e3a5f;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --border: #334155;
+      --region-header: #0ea5e9;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', 'Noto Sans JP', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ===== HERO ===== */
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
+      padding: 60px 20px 40px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(56,189,248,0.15) 0%, transparent 70%);
+    }
+
+    .hero h1 {
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #fff 0%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      position: relative;
+      margin-bottom: 12px;
+    }
+
+    .hero p {
+      color: var(--text-muted);
+      font-size: 1rem;
+      position: relative;
+      max-width: 600px;
+      margin: 0 auto 28px;
+    }
+
+    /* ===== LEGEND ===== */
+    .legend {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      position: relative;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .legend-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    /* ===== FILTER BAR ===== */
+    .filter-bar {
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 20px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .filter-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .filter-btn {
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 500;
+    }
+
+    .filter-btn:hover,
+    .filter-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    /* ===== MONTH HIGHLIGHT ===== */
+    .month-highlight {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .month-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 600;
+    }
+
+    .month-btn:hover,
+    .month-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #0f172a;
+    }
+
+    /* ===== MAIN CONTENT ===== */
+    .main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 32px 16px 60px;
+    }
+
+    /* ===== REGION SECTION ===== */
+    .region-section {
+      margin-bottom: 40px;
+    }
+
+    .region-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--region-header);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+      padding-left: 12px;
+      border-left: 3px solid var(--region-header);
+    }
+
+    /* ===== CALENDAR TABLE ===== */
+    .calendar-wrapper {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--card-bg);
+      min-width: 700px;
+    }
+
+    thead tr {
+      background: var(--header-bg);
+    }
+
+    thead th {
+      padding: 10px 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-align: center;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
+    }
+
+    thead th:first-child {
+      text-align: left;
+      padding-left: 16px;
+      min-width: 160px;
+      color: var(--text);
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+
+    tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background: rgba(56,189,248,0.05);
+    }
+
+    tbody td {
+      padding: 0;
+      text-align: center;
+    }
+
+    tbody td:first-child {
+      text-align: left;
+      padding: 12px 16px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .cell {
+      width: 100%;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      cursor: default;
+      transition: filter 0.2s, transform 0.1s;
+      position: relative;
+    }
+
+    .cell:hover {
+      filter: brightness(1.2);
+      transform: scaleY(1.05);
+      z-index: 1;
+    }
+
+    .cell.best {
+      background: var(--best);
+      color: #064e3b;
+    }
+
+    .cell.good {
+      background: var(--good);
+      color: #78350f;
+    }
+
+    .cell.avoid {
+      background: var(--avoid);
+      color: #7f1d1d;
+    }
+
+    .cell.neutral {
+      background: var(--neutral);
+      color: #64748b;
+    }
+
+    /* Highlight column */
+    td.highlight-col .cell {
+      outline: 2px solid var(--accent);
+      outline-offset: -2px;
+    }
+
+    /* ===== TOOLTIP ===== */
+    .cell[data-tip]:hover::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e293b;
+      border: 1px solid var(--accent);
+      color: var(--text);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      white-space: nowrap;
+      z-index: 200;
+      pointer-events: none;
+      font-weight: 500;
+    }
+
+    /* ===== HIDDEN ROWS ===== */
+    tr.hidden-row {
+      display: none;
+    }
+
+    /* ===== STATS BAR ===== */
+    .stats-bar {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 20px;
+      text-align: center;
+      min-width: 120px;
+    }
+
+    .stat-num {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 2px;
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      text-align: center;
+      padding: 24px;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 600px) {
+      .filter-bar {
+        padding: 12px;
+        gap: 8px;
+      }
+      .month-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 0.6rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>🌍 世界旅行 ベストシーズンカレンダー</h1>
+  <p>世界各地域の観光に最適な月を一覧で確認。旅行計画の参考にどうぞ。</p>
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-dot" style="background:var(--best)"></div>
+      <span>ベストシーズン</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:var(--good)"></div>
+      <span>まずまず / 肩シーズン</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:var(--avoid)"></div>
+      <span>避けるべき時期</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:var(--neutral)"></div>
+      <span>普通</span>
+    </div>
+  </div>
+</div>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <span class="filter-label">地域</span>
+  <button class="filter-btn active" onclick="filterRegion('all', this)">すべて</button>
+  <button class="filter-btn" onclick="filterRegion('east-asia', this)">東アジア</button>
+  <button class="filter-btn" onclick="filterRegion('southeast-asia', this)">東南アジア</button>
+  <button class="filter-btn" onclick="filterRegion('south-asia', this)">南アジア</button>
+  <button class="filter-btn" onclick="filterRegion('middle-east', this)">中東</button>
+  <button class="filter-btn" onclick="filterRegion('europe', this)">ヨーロッパ</button>
+  <button class="filter-btn" onclick="filterRegion('africa', this)">アフリカ</button>
+  <button class="filter-btn" onclick="filterRegion('north-america', this)">北米</button>
+  <button class="filter-btn" onclick="filterRegion('latin-america', this)">中南米</button>
+  <button class="filter-btn" onclick="filterRegion('oceania', this)">オセアニア</button>
+
+  <span class="filter-label" style="margin-left:12px">月</span>
+  <div class="month-highlight">
+    <button class="month-btn" onclick="highlightMonth(0, this)">1</button>
+    <button class="month-btn" onclick="highlightMonth(1, this)">2</button>
+    <button class="month-btn" onclick="highlightMonth(2, this)">3</button>
+    <button class="month-btn" onclick="highlightMonth(3, this)">4</button>
+    <button class="month-btn" onclick="highlightMonth(4, this)">5</button>
+    <button class="month-btn" onclick="highlightMonth(5, this)">6</button>
+    <button class="month-btn" onclick="highlightMonth(6, this)">7</button>
+    <button class="month-btn" onclick="highlightMonth(7, this)">8</button>
+    <button class="month-btn" onclick="highlightMonth(8, this)">9</button>
+    <button class="month-btn" onclick="highlightMonth(9, this)">10</button>
+    <button class="month-btn" onclick="highlightMonth(10, this)">11</button>
+    <button class="month-btn" onclick="highlightMonth(11, this)">12</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- STATS -->
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="stat-num">30+</div>
+      <div class="stat-label">掲載地域数</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">9</div>
+      <div class="stat-label">大エリア</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">12</div>
+      <div class="stat-label">月別カレンダー</div>
+    </div>
+  </div>
+
+  <!-- ======================== EAST ASIA ======================== -->
+  <div class="region-section" data-region="east-asia">
+    <div class="region-title">🏯 東アジア</div>
+    <div class="calendar-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>地域 / 国</th>
+            <th>1月</th><th>2月</th><th>3月</th><th>4月</th>
+            <th>5月</th><th>6月</th><th>7月</th><th>8月</th>
+            <th>9月</th><th>10月</th><th>11月</th><th>12月</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-region="east-asia">
+            <td>🇯🇵 日本（本州）</td>
+            <td><div class="cell avoid" data-tip="寒冷・降雪">×</div></td>
+            <td><div class="cell avoid" data-tip="寒冷・梅の季節">×</div></td>
+            <td><div class="cell good" data-tip="桜シーズン開始">△</div></td>
+            <td><div class="cell best" data-tip="桜・春の絶景">◎</div></td>
+            <td><div class="cell best" data-tip="新緑・過ごしやすい">◎</div></td>
+            <td><div class="cell avoid" data-tip="梅雨・高温多湿">×</div></td>
+            <td><div class="cell avoid" data-tip="猛暑・台風">×</div></td>
+            <td><div class="cell avoid" data-tip="猛暑・台風">×</div></td>
+            <td><div class="cell good" data-tip="台風シーズン終盤">△</div></td>
+            <td><div class="cell best" data-tip="紅葉・秋晴れ">◎</div></td>
+            <td><div class="cell best" data-tip="紅葉・快適">◎</div></td>
+            <td><div class="cell good" data-tip="冬景色・年末">△</div></td>
+          </tr>
+          <tr data-region="east-asia">
+            <td>🇯🇵 北海道</td>
+            <td><div class="cell good" data-tip="雪まつり・スキー">△</div></td>
+            <td><div class="cell best" data-tip="さっぽろ雪まつり">◎</div></td>
+            <td><div class="cell avoid" data-tip="雪解け・ぬかるみ">×</div></td>
+            <td><div class="cell good" data-tip="春の訪れ">△</div></td>
+            <td><div class="cell best" data-tip="ラベンダー前・爽快">◎</div></td>
+            <td><div class="cell best" data-tip="過ごしやすい夏">◎</div></td>
+            <td><div class="cell best" data-tip="ラベンダー・夏祭り">◎</div></td>
+            <td><div class="cell best" data-tip="夏の絶景">◎</div></td>
+            <td><div class="cell good" data-tip="紅葉シーズン">△</div></td>
+            <td><div class="cell best" data-tip="紅葉・秋の味覚">◎</div></td>
+            <td><div class="cell avoid" data-tip="初雪・寒冷">×</div></td>
+            <td><div class="cell good" data-tip="スキーシーズン開始">△</div></td>
+          </tr>
+          <tr data-region="east-asia">
+            <td>🇨🇳 中国（北京・上海）</td>
+            <td><div class="cell avoid" data-tip="厳寒・大気汚染">×</div></td>
+            <td><div class="cell avoid" data-tip="厳寒・春節混雑">×</div></td>
+            <td><div class="cell good" data-tip="春の訪れ・砂嵐注意">△</div></td>
+            <td><div class="cell best" data-tip="桜・過ごしやすい">◎</div></td>
+            <td><div class="cell best" data-tip="快適・観光最適">◎</div></td>
+            <td><div class="cell good" data-tip="雨季開始・蒸し暑い">△</div></td>
+            <td><div class="cell avoid" data-tip="猛暑・豪雨">×</div></td>
+            <td><div class="cell avoid" data-tip="猛暑・台風">×</div></td>
+            <td><div class="cell best" data-tip="秋晴れ・快適">◎</div></td>
+            <td><div class="cell best" data-tip="紅葉・黄金週間後">◎</div></td>
+            <td><div class="cell good" data-tip="やや寒い・空気澄む">△</div></td>
+            <td><div class="cell avoid" data-tip="寒冷・大気汚染">×</div></td>
+          </tr>
+          <tr data-region="east-asia">
+            <td>🇰🇷 韓国</td>
+            <td><div class="cell avoid" data-tip="氷点下・厳寒">×</div></td>
+            <td><div class="cell avoid" data-tip="厳寒・旧正月">×</div></td>
+            <td><div class="cell best" data-tip="桜・春の花">◎</div></td>
+            <td><div class="cell best" data-tip="桜満開・観光最適">◎</div></td>
+            <td><div class="cell best" data-tip="新緑・過ごしやすい">◎</div></td>
+            <td><div class="cell good" data-tip="梅雨前・蒸し暑くなる">△</div></td>
+            <td><div class="cell avoid" data-tip="梅雨・猛暑">×</div></td>
+            <td><div class="cell avoid" data-tip="猛暑・台風">×</div></td>
+            <td><div class="cell best" data-tip="秋晴れ・紅葉">◎</div></td>
+            <td><div class="cell best" data-tip="紅葉ピーク・快適">◎</div></td>
+            <td><div class="cell good" data-tip="やや寒い・冬の準備">△</div></td>
+            <td><div class="cell good" data-tip="スキー・クリスマス">△</div></td>
+          </tr>
+          <tr data-region="east-asia">
+            <td>🇹🇼 台湾</td>
+            <td><div class="cell avoid" data-tip="雨多い・肌寒い">×</div></td>
+            <td><div class="cell avoid" data-tip="雨多い・寒い">×</div></td>
+            <td><div class="cell best" data-tip="春の訪れ・快適">◎</div></td>
+            <td><div class="cell best" data-tip="過ごしやすい春">◎</div></td>
+            <td><div class="cell good" data-tip="梅雨前・やや暑い">△</div></td>
+            <td><div class="cell avoid" data-tip="梅雨・台風シーズン">×</div></td>
+            <td><div class="cell avoid" data-tip="猛暑・台風">×</div></td>
+            <td><div class="cell avoid" data-tip="猛暑・台風">×</div></td>
+            <td><div class="cell avoid" data-tip="台風シーズン">×</div></td>
+            <td><div class="cell best" data-tip="秋晴れ・快適">◎</div></td>
+            <td><div class="cell best" data-tip="最高の季節">◎</div></td>
+            <td><div class="cell good" data-tip="やや寒い・雨多め">△</div></td>
+          </tr>
+          <tr data-region="east-asia">
+            <td>🇭🇰 香港・マカオ</td>
+            <td><div class="cell avoid" data-tip="寒い・雨多い">×</div></td>
+            <td><div class="cell avoid" data-tip="寒い・旧正月">×</div></td>
+            <td><div class="cell best" data-tip="春・過ごしやすい">◎</div></td>
+            <td><div class="cell best" data-tip="快適な春">◎</div></td>
+            <td><div class="cell good" data-tip="やや蒸し暑い">△</div></td>
+            <td><div class="cell avoid" data-tip="台風・豪雨">×</div></td>
+            <td><div class="cell avoid" data-tip="台風・猛暑">×</div></td>
+            <td><div class="cell avoid" data-tip="台風・猛暑">×</div></td>
+            <td><div class="cell avoid" data-tip="台風シーズン">×</div></td>
+            <td><div class="cell best" data-tip="秋晴れ・快適">◎</div></td>
+            <td><div class="cell best" data-tip="最高の季節">◎</div></td>
+            <td><div class="cell good" data-tip="やや寒い・クリスマス">△</div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ======================== SOUTHEAST ASIA ======================== -->
+  <div class="region-section" data-region="southeast-asia">
+    <div class="region-title">🌴 東南アジア</div>
+    <div class="calendar-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>地域 / 国</th>
+            <th>1月</th><th>2月</th><th>3月</th><th>4月</th>
+            <th>5月</th><th>6月</th><th>7月</th><th>8月</th>
+            <th>9月</th><th>10月</th><th>11月</th><th>12月</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-region="southeast-asia">
+            <td>🇹🇭 タイ（バンコク）</td>
+            <td><div class="cell best" data-tip="乾季・涼しい">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・最高の時期">◎</div></td>
+            <td><div class="cell good" data-tip="暑季・暑い">△</div></td>
+            <td><div class="cell avoid" data-tip="酷暑・ソンクラーン">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季開始・蒸し暑い">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季・スコール多い">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季・豪雨">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季・豪雨">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季・最も雨が多い">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季終盤">×</div></td>
+            <td><div class="cell best" data-tip="乾季開始・快適">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・観光最適">◎</div></td>
+          </tr>
+          <tr data-region="southeast-asia">
+            <td>🇻🇳 ベトナム（ハノイ）</td>
+            <td><div class="cell good" data-tip="涼しい・やや曇り">△</div></td>
+            <td><div class="cell good" data-tip="春節・やや寒い">△</div></td>
+            <td><div class="cell best" data-tip="春・過ごしやすい">◎</div></td>
+            <td><div class="cell best" data-tip="快適な春">◎</div></td>
+            <td><div class="cell good" data-tip="やや暑い・雨増加">△</div></td>
+            <td><div class="cell avoid" data-tip="雨季・高温多湿">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季・豪雨">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季・台風">×</div></td>
+            <td><div class="cell avoid" data-tip="台風シーズン">×</div></td>
+            <td><div class="cell best" data-tip="秋・快適">◎</div></td>
+            <td><div class="cell best" data-tip="秋・観光最適">◎</div></td>
+            <td><div class="cell good" data-tip="涼しい・快適">△</div></td>
+          </tr>
+          <tr data-region="southeast-asia">
+            <td>🇻🇳 ベトナム（ホーチミン）</td>
+            <td><div class="cell best" data-tip="乾季・快適">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・最高の時期">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・暑いが快適">◎</div></td>
+            <td><div class="cell good" data-tip="乾季終盤・暑い">△</div></td>
+            <td><div class="cell avoid" data-tip="雨季開始">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季・スコール多い">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季・豪雨">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季・豪雨">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季・最も雨が多い">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季終盤">×</div></td>
+            <td><div class="cell good" data-tip="乾季開始・やや雨">△</div></td>
+            <td><div class="cell best" data-tip="乾季・快適">◎</div></td>
+          </tr>
+          <tr data-region="southeast-asia">
+            <td>🇵🇭 フィリピン</td>
+            <td><div class="cell best" data-tip="乾季・涼しい">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・最高の時期">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・快適">◎</div></td>
+            <td><div class="cell good" data-tip="乾季終盤・暑い">△</div></td>
+            <td><div class="cell good" data-tip="乾季終わり・暑い">△</div></td>
+            <td><div class="cell avoid" data-tip="雨季・台風シーズン">×</div></td>
+            <td><div class="cell avoid" data-tip="台風・豪雨">×</div></td>
+            <td><div class="cell avoid" data-tip="台風・豪雨">×</div></td>
+            <td><div class="cell avoid" data-tip="台風ピーク">×</div></td>
+            <td><div class="cell avoid" data-tip="台風シーズン終盤">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季終盤・台風">×</div></td>
+            <td><div class="cell best" data-tip="乾季開始・快適">◎</div></td>
+          </tr>
+          <tr data-region="southeast-asia">
+            <td>🇸🇬 シンガポール</td>
+            <td><div class="cell avoid" data-tip="雨季・スコール多い">×</div></td>
+            <td><div class="cell best" data-tip="比較的乾燥・快適">◎</div></td>
+            <td><div class="cell best" data-tip="過ごしやすい">◎</div></td>
+            <td><div class="cell best" data-tip="快適・観光最適">◎</div></td>
+            <td><div class="cell best" data-tip="快適・GSS準備">◎</div></td>
+            <td><div class="cell best" data-tip="GSS・フードフェス">◎</div></td>
+            <td><div class="cell best" data-tip="フードフェスティバル">◎</div></td>
+            <td><div class="cell best" data-tip="快適・イベント多数">◎</div></td>
+            <td><div class="cell best" data-tip="快適">◎</div></td>
+            <td><div class="cell best" data-tip="快適・ディパバリ">◎</div></td>
+            <td><div class="cell avoid" data-tip="雨季・スコール多い">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季ピーク">×</div></td>
+          </tr>
+          <tr data-region="southeast-asia">
+            <td>🇲🇾 マレーシア（KL）</td>
+            <td><div class="cell best" data-tip="比較的乾燥・快適">◎</div></td>
+            <td><div class="cell best" data-tip="快適・旧正月">◎</div></td>
+            <td><div class="cell best" data-tip="快適・観光最適">◎</div></td>
+            <td><div class="cell best" data-tip="快適">◎</div></td>
+            <td><div class="cell good" data-tip="やや雨が増える">△</div></td>
+            <td><div class="cell good" data-tip="スコールあり">△</div></td>
+            <td><div class="cell good" data-tip="スコールあり">△</div></td>
+            <td><div class="cell good" data-tip="スコールあり">△</div></td>
+            <td><div class="cell good" data-tip="スコールあり">△</div></td>
+            <td><div class="cell good" data-tip="雨季開始">△</div></td>
+            <td><div class="cell avoid" data-tip="東海岸は雨季・高波">×</div></td>
+            <td><div class="cell avoid" data-tip="東海岸は雨季ピーク">×</div></td>
+          </tr>
+          <tr data-region="southeast-asia">
+            <td>🇮🇩 バリ島</td>
+            <td><div class="cell avoid" data-tip="雨季・高温多湿">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季・スコール多い">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季終盤">×</div></td>
+            <td><div class="cell good" data-tip="乾季開始・やや雨">△</div></td>
+            <td><div class="cell best" data-tip="乾季・快適">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・観光最適">◎</div></td>
+            <td><div class="cell best" data-tip="乾季ピーク・最高">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・絶好の季節">◎</div></td>
+            <td><div class="cell best" data-tip="乾季終盤・快適">◎</div></td>
+            <td><div class="cell good" data-tip="雨季開始・やや雨">△</div></td>
+            <td><div class="cell avoid" data-tip="雨季・スコール増加">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季・年末混雑">×</div></td>
+          </tr>
+          <tr data-region="southeast-asia">
+            <td>🇲🇲 ミャンマー・カンボジア</td>
+            <td><div class="cell best" data-tip="乾季・涼しい">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・最高の時期">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・暑くなる">◎</div></td>
+            <td><div class="cell good" data-tip="暑季・酷暑">△</div></td>
+            <td><div class="cell avoid" data-tip="雨季開始">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季・豪雨">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季・豪雨">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季ピーク">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季・洪水リスク">×</div></td>
+            <td><div class="cell good" data-tip="雨季終盤・やや雨">△</div></td>
+            <td><div class="cell best" data-tip="乾季開始・快適">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・観光最適">◎</div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ======================== SOUTH ASIA ======================== -->
+  <div class="region-section" data-region="south-asia">
+    <div class="region-title">🕌 南アジア</div>
+    <div class="calendar-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>地域 / 国</th>
+            <th>1月</th><th>2月</th><th>3月</th><th>4月</th>
+            <th>5月</th><th>6月</th><th>7月</th><th>8月</th>
+            <th>9月</th><th>10月</th><th>11月</th><th>12月</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-region="south-asia">
+            <td>🇮🇳 インド（北部）</td>
+            <td><div class="cell best" data-tip="乾季・涼しい">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・快適">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・暖かい">◎</div></td>
+            <td><div class="cell good" data-tip="暑くなる">△</div></td>
+            <td><div class="cell avoid" data-tip="酷暑・45℃超え">×</div></td>
+            <td><div class="cell avoid" data-tip="モンスーン開始">×</div></td>
+            <td><div class="cell avoid" data-tip="モンスーン・豪雨">×</div></td>
+            <td><div class="cell avoid" data-tip="モンスーン・豪雨">×</div></td>
+            <td><div class="cell avoid" data-tip="モンスーン終盤">×</div></td>
+            <td><div class="cell best" data-tip="乾季開始・快適">◎</div></td>
+            <td><div class="cell best" data-tip="最高の季節">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・観光最適">◎</div></td>
+          </tr>
+          <tr data-region="south-asia">
+            <td>🇮🇳 インド（南部・ゴア）</td>
+            <td><div class="cell best" data-tip="乾季・快適">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・最高の時期">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・暑くなる">◎</div></td>
+            <td><div class="cell good" data-tip="暑くなる">△</div></td>
+            <td><div class="cell avoid" data-tip="酷暑・前モンスーン">×</div></td>
+            <td><div class="cell avoid" data-tip="モンスーン・豪雨">×</div></td>
+            <td><div class="cell avoid" data-tip="モンスーン・豪雨">×</div></td>
+            <td><div class="cell avoid" data-tip="モンスーン・豪雨">×</div></td>
+            <td><div class="cell avoid" data-tip="モンスーン終盤">×</div></td>
+            <td><div class="cell good" data-tip="乾季開始・やや雨">△</div></td>
+            <td><div class="cell best" data-tip="快適・観光最適">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・快適">◎</div></td>
+          </tr>
+          <tr data-region="south-asia">
+            <td>🇱🇰 スリランカ</td>
+            <td><div class="cell best" data-tip="西海岸乾季・快適">◎</div></td>
+            <td><div class="cell best" data-tip="西海岸乾季・最高">◎</div></td>
+            <td><div class="cell best" data-tip="西海岸乾季">◎</div></td>
+            <td><div class="cell good" data-tip="東海岸乾季開始">△</div></td>
+            <td><div class="cell avoid" data-tip="西海岸モンスーン">×</div></td>
+            <td><div class="cell avoid" data-tip="西海岸モンスーン">×</div></td>
+            <td><div class="cell good" data-tip="東海岸乾季・快適">△</div></td>
+            <td><div class="cell best" data-tip="東海岸ベストシーズン">◎</div></td>
+            <td><div class="cell best" data-tip="東海岸・快適">◎</div></td>
+            <td><div class="cell avoid" data-tip="東海岸モンスーン">×</div></td>
+            <td><div class="cell avoid" data-tip="東海岸モンスーン">×</div></td>
+            <td><div class="cell best" data-tip="西海岸乾季開始">◎</div></td>
+          </tr>
+          <tr data-region="south-asia">
+            <td>🇳🇵 ネパール（トレッキング）</td>
+            <td><div class="cell avoid" data-tip="厳寒・高山は困難">×</div></td>
+            <td><div class="cell avoid" data-tip="厳寒・雪多い">×</div></td>
+            <td><div class="cell good" data-tip="春トレッキング開始">△</div></td>
+            <td><div class="cell best" data-tip="春トレッキング最適">◎</div></td>
+            <td><div class="cell best" data-tip="春の絶景・快適">◎</div></td>
+            <td><div class="cell avoid" data-tip="モンスーン・視界不良">×</div></td>
+            <td><div class="cell avoid" data-tip="モンスーン・豪雨">×</div></td>
+            <td><div class="cell avoid" data-tip="モンスーン・豪雨">×</div></td>
+            <td><div class="cell good" data-tip="モンスーン終盤">△</div></td>
+            <td><div class="cell best" data-tip="秋トレッキング最適">◎</div></td>
+            <td><div class="cell best" data-tip="秋の絶景・快適">◎</div></td>
+            <td><div class="cell avoid" data-tip="寒冷・雪">×</div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ======================== MIDDLE EAST ======================== -->
+  <div class="region-section" data-region="middle-east">
+    <div class="region-title">🌙 中東</div>
+    <div class="calendar-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>地域 / 国</th>
+            <th>1月</th><th>2月</th><th>3月</th><th>4月</th>
+            <th>5月</th><th>6月</th><th>7月</th><th>8月</th>
+            <th>9月</th><th>10月</th><th>11月</th><th>12月</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-region="middle-east">
+            <td>🇦🇪 UAE（ドバイ）</td>
+            <td><div class="cell best" data-tip="快適・観光最適">◎</div></td>
+            <td><div class="cell best" data-tip="快適・最高の時期">◎</div></td>
+            <td><div class="cell best" data-tip="快適・暖かい">◎</div></td>
+            <td><div class="cell good" data-tip="暑くなる">△</div></td>
+            <td><div class="cell avoid" data-tip="酷暑・40℃超え">×</div></td>
+            <td><div class="cell avoid" data-tip="酷暑・45℃超え">×</div></td>
+            <td><div class="cell avoid" data-tip="酷暑・最高気温">×</div></td>
+            <td><div class="cell avoid" data-tip="酷暑・高湿度">×</div></td>
+            <td><div class="cell avoid" data-tip="酷暑・やや和らぐ">×</div></td>
+            <td><div class="cell best" data-tip="快適・観光シーズン">◎</div></td>
+            <td><div class="cell best" data-tip="快適・最高の時期">◎</div></td>
+            <td><div class="cell best" data-tip="快適・年末イベント">◎</div></td>
+          </tr>
+          <tr data-region="middle-east">
+            <td>🇯🇴 ヨルダン・イスラエル</td>
+            <td><div class="cell good" data-tip="涼しい・雨あり">△</div></td>
+            <td><div class="cell good" data-tip="涼しい・快適">△</div></td>
+            <td><div class="cell best" data-tip="春・快適">◎</div></td>
+            <td><div class="cell best" data-tip="春の絶景・最高">◎</div></td>
+            <td><div class="cell best" data-tip="暖かい・快適">◎</div></td>
+            <td><div class="cell good" data-tip="暑い・乾燥">△</div></td>
+            <td><div class="cell avoid" data-tip="酷暑・40℃超え">×</div></td>
+            <td><div class="cell avoid" data-tip="酷暑">×</div></td>
+            <td><div class="cell good" data-tip="暑い・和らぐ">△</div></td>
+            <td><div class="cell best" data-tip="秋・快適">◎</div></td>
+            <td><div class="cell best" data-tip="秋・観光最適">◎</div></td>
+            <td><div class="cell good" data-tip="涼しい・雨あり">△</div></td>
+          </tr>
+          <tr data-region="middle-east">
+            <td>🇹🇷 トルコ</td>
+            <td><div class="cell avoid" data-tip="寒冷・雨多い">×</div></td>
+            <td><div class="cell avoid" data-tip="寒冷・雨多い">×</div></td>
+            <td><div class="cell good" data-tip="春の訪れ・やや雨">△</div></td>
+            <td><div class="cell best" data-tip="春・快適">◎</div></td>
+            <td><div class="cell best" data-tip="春・観光最適">◎</div></td>
+            <td><div class="cell best" data-tip="夏・快適">◎</div></td>
+            <td><div class="cell best" data-tip="夏・ビーチ最適">◎</div></td>
+            <td><div class="cell best" data-tip="夏・快適">◎</div></td>
+            <td><div class="cell best" data-tip="秋・快適">◎</div></td>
+            <td><div class="cell good" data-tip="秋・やや涼しい">△</div></td>
+            <td><div class="cell avoid" data-tip="寒冷・雨多い">×</div></td>
+            <td><div class="cell avoid" data-tip="寒冷・雪あり">×</div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ======================== EUROPE ======================== -->
+  <div class="region-section" data-region="europe">
+    <div class="region-title">🏰 ヨーロッパ</div>
+    <div class="calendar-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>地域 / 国</th>
+            <th>1月</th><th>2月</th><th>3月</th><th>4月</th>
+            <th>5月</th><th>6月</th><th>7月</th><th>8月</th>
+            <th>9月</th><th>10月</th><th>11月</th><th>12月</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-region="europe">
+            <td>🇫🇷 西欧（仏・英・蘭）</td>
+            <td><div class="cell avoid" data-tip="寒冷・雨多い">×</div></td>
+            <td><div class="cell avoid" data-tip="寒冷・雨多い">×</div></td>
+            <td><div class="cell good" data-tip="春の訪れ・チューリップ">△</div></td>
+            <td><div class="cell best" data-tip="春・チューリップ満開">◎</div></td>
+            <td><div class="cell best" data-tip="春・最高の季節">◎</div></td>
+            <td><div class="cell best" data-tip="夏・長い日照">◎</div></td>
+            <td><div class="cell best" data-tip="夏・観光ピーク">◎</div></td>
+            <td><div class="cell best" data-tip="夏・快適">◎</div></td>
+            <td><div class="cell best" data-tip="秋・快適・混雑少ない">◎</div></td>
+            <td><div class="cell good" data-tip="秋・やや雨">△</div></td>
+            <td><div class="cell avoid" data-tip="寒冷・雨多い">×</div></td>
+            <td><div class="cell good" data-tip="クリスマスマーケット">△</div></td>
+          </tr>
+          <tr data-region="europe">
+            <td>🇮🇹 南欧（伊・西・希）</td>
+            <td><div class="cell avoid" data-tip="寒冷・雨多い">×</div></td>
+            <td><div class="cell avoid" data-tip="寒冷・雨多い">×</div></td>
+            <td><div class="cell good" data-tip="春の訪れ・快適">△</div></td>
+            <td><div class="cell best" data-tip="春・快適・混雑少ない">◎</div></td>
+            <td><div class="cell best" data-tip="春・最高の季節">◎</div></td>
+            <td><div class="cell best" data-tip="夏・ビーチ・快適">◎</div></td>
+            <td><div class="cell good" data-tip="夏・酷暑・混雑">△</div></td>
+            <td><div class="cell good" data-tip="夏・酷暑・混雑">△</div></td>
+            <td><div class="cell best" data-tip="秋・快適・混雑少ない">◎</div></td>
+            <td><div class="cell best" data-tip="秋・最高の季節">◎</div></td>
+            <td><div class="cell good" data-tip="秋終盤・やや雨">△</div></td>
+            <td><div class="cell avoid" data-tip="寒冷・雨多い">×</div></td>
+          </tr>
+          <tr data-region="europe">
+            <td>🇩🇪 中欧（独・墺・チェコ）</td>
+            <td><div class="cell avoid" data-tip="厳寒・雪">×</div></td>
+            <td><div class="cell avoid" data-tip="厳寒・雪">×</div></td>
+            <td><div class="cell good" data-tip="春の訪れ">△</div></td>
+            <td><div class="cell best" data-tip="春・快適">◎</div></td>
+            <td><div class="cell best" data-tip="春・最高の季節">◎</div></td>
+            <td><div class="cell best" data-tip="夏・快適">◎</div></td>
+            <td><div class="cell best" data-tip="夏・観光ピーク">◎</div></td>
+            <td><div class="cell best" data-tip="夏・快適">◎</div></td>
+            <td><div class="cell best" data-tip="秋・快適">◎</div></td>
+            <td><div class="cell good" data-tip="秋・やや寒い">△</div></td>
+            <td><div class="cell avoid" data-tip="寒冷・雨多い">×</div></td>
+            <td><div class="cell good" data-tip="クリスマスマーケット">△</div></td>
+          </tr>
+          <tr data-region="europe">
+            <td>🇸🇪 北欧（スカンジナビア）</td>
+            <td><div class="cell good" data-tip="オーロラ観測・極寒">△</div></td>
+            <td><div class="cell good" data-tip="オーロラ観測・極寒">△</div></td>
+            <td><div class="cell good" data-tip="オーロラ終盤・雪解け">△</div></td>
+            <td><div class="cell good" data-tip="春の訪れ・長い日照">△</div></td>
+            <td><div class="cell best" data-tip="春・白夜開始">◎</div></td>
+            <td><div class="cell best" data-tip="白夜・夏至祭">◎</div></td>
+            <td><div class="cell best" data-tip="白夜・夏の絶景">◎</div></td>
+            <td><div class="cell best" data-tip="夏・快適">◎</div></td>
+            <td><div class="cell good" data-tip="秋・紅葉">△</div></td>
+            <td><div class="cell good" data-tip="秋・オーロラ開始">△</div></td>
+            <td><div class="cell avoid" data-tip="極寒・暗い">×</div></td>
+            <td><div class="cell avoid" data-tip="極寒・暗い">×</div></td>
+          </tr>
+          <tr data-region="europe">
+            <td>🇭🇷 東欧（クロアチア・ハンガリー）</td>
+            <td><div class="cell avoid" data-tip="厳寒・雪">×</div></td>
+            <td><div class="cell avoid" data-tip="厳寒・雪">×</div></td>
+            <td><div class="cell good" data-tip="春の訪れ">△</div></td>
+            <td><div class="cell best" data-tip="春・快適">◎</div></td>
+            <td><div class="cell best" data-tip="春・最高の季節">◎</div></td>
+            <td><div class="cell best" data-tip="夏・快適">◎</div></td>
+            <td><div class="cell best" data-tip="夏・ビーチ・観光ピーク">◎</div></td>
+            <td><div class="cell best" data-tip="夏・快適">◎</div></td>
+            <td><div class="cell best" data-tip="秋・快適・混雑少ない">◎</div></td>
+            <td><div class="cell good" data-tip="秋・やや寒い">△</div></td>
+            <td><div class="cell avoid" data-tip="寒冷・雨多い">×</div></td>
+            <td><div class="cell avoid" data-tip="厳寒・雪">×</div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ======================== AFRICA ======================== -->
+  <div class="region-section" data-region="africa">
+    <div class="region-title">🦁 アフリカ</div>
+    <div class="calendar-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>地域 / 国</th>
+            <th>1月</th><th>2月</th><th>3月</th><th>4月</th>
+            <th>5月</th><th>6月</th><th>7月</th><th>8月</th>
+            <th>9月</th><th>10月</th><th>11月</th><th>12月</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-region="africa">
+            <td>🇰🇪 東アフリカ（ケニア・タンザニア）</td>
+            <td><div class="cell best" data-tip="乾季・サファリ最適">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・動物観察">◎</div></td>
+            <td><div class="cell good" data-tip="短い雨季前">△</div></td>
+            <td><div class="cell avoid" data-tip="長い雨季・道路悪化">×</div></td>
+            <td><div class="cell avoid" data-tip="長い雨季">×</div></td>
+            <td><div class="cell best" data-tip="乾季・ヌー大移動">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・ヌー大移動ピーク">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・サファリ最高">◎</div></td>
+            <td><div class="cell best" data-tip="乾季終盤・快適">◎</div></td>
+            <td><div class="cell good" data-tip="短い雨季開始">△</div></td>
+            <td><div class="cell avoid" data-tip="短い雨季">×</div></td>
+            <td><div class="cell best" data-tip="乾季・快適">◎</div></td>
+          </tr>
+          <tr data-region="africa">
+            <td>🇿🇦 南アフリカ</td>
+            <td><div class="cell good" data-tip="夏・暑い・雨あり">△</div></td>
+            <td><div class="cell good" data-tip="夏・暑い・雨あり">△</div></td>
+            <td><div class="cell best" data-tip="秋・快適">◎</div></td>
+            <td><div class="cell best" data-tip="秋・快適・クジラ">◎</div></td>
+            <td><div class="cell best" data-tip="冬・サファリ最適">◎</div></td>
+            <td><div class="cell best" data-tip="冬・乾燥・サファリ">◎</div></td>
+            <td><div class="cell best" data-tip="冬・乾季ピーク">◎</div></td>
+            <td><div class="cell best" data-tip="冬・快適">◎</div></td>
+            <td><div class="cell best" data-tip="春・快適">◎</div></td>
+            <td><div class="cell good" data-tip="春・暖かい">△</div></td>
+            <td><div class="cell good" data-tip="夏開始・暑い">△</div></td>
+            <td><div class="cell avoid" data-tip="夏・暑い・混雑">×</div></td>
+          </tr>
+          <tr data-region="africa">
+            <td>🇲🇦 北アフリカ（モロッコ・エジプト）</td>
+            <td><div class="cell good" data-tip="涼しい・雨あり">△</div></td>
+            <td><div class="cell good" data-tip="涼しい・快適">△</div></td>
+            <td><div class="cell best" data-tip="春・快適">◎</div></td>
+            <td><div class="cell best" data-tip="春・最高の季節">◎</div></td>
+            <td><div class="cell best" data-tip="春終盤・暖かい">◎</div></td>
+            <td><div class="cell good" data-tip="暑い・乾燥">△</div></td>
+            <td><div class="cell avoid" data-tip="酷暑・40℃超え">×</div></td>
+            <td><div class="cell avoid" data-tip="酷暑">×</div></td>
+            <td><div class="cell best" data-tip="秋・快適">◎</div></td>
+            <td><div class="cell best" data-tip="秋・最高の季節">◎</div></td>
+            <td><div class="cell best" data-tip="秋・快適">◎</div></td>
+            <td><div class="cell good" data-tip="涼しい・雨あり">△</div></td>
+          </tr>
+          <tr data-region="africa">
+            <td>🇸🇳 西アフリカ（セネガル・ガンビア）</td>
+            <td><div class="cell best" data-tip="乾季・快適">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・最高の時期">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・快適">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・暑くなる">◎</div></td>
+            <td><div class="cell good" data-tip="暑い・雨季前">△</div></td>
+            <td><div class="cell avoid" data-tip="雨季開始">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季・豪雨">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季ピーク">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季終盤">×</div></td>
+            <td><div class="cell good" data-tip="乾季開始・やや雨">△</div></td>
+            <td><div class="cell best" data-tip="乾季・快適">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・観光最適">◎</div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ======================== NORTH AMERICA ======================== -->
+  <div class="region-section" data-region="north-america">
+    <div class="region-title">🗽 北米</div>
+    <div class="calendar-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>地域 / 国</th>
+            <th>1月</th><th>2月</th><th>3月</th><th>4月</th>
+            <th>5月</th><th>6月</th><th>7月</th><th>8月</th>
+            <th>9月</th><th>10月</th><th>11月</th><th>12月</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-region="north-america">
+            <td>🇺🇸 ニューヨーク・東海岸</td>
+            <td><div class="cell avoid" data-tip="厳寒・降雪">×</div></td>
+            <td><div class="cell avoid" data-tip="厳寒・降雪">×</div></td>
+            <td><div class="cell good" data-tip="春の訪れ・やや寒い">△</div></td>
+            <td><div class="cell best" data-tip="春・快適">◎</div></td>
+            <td><div class="cell best" data-tip="春・最高の季節">◎</div></td>
+            <td><div class="cell best" data-tip="夏・快適">◎</div></td>
+            <td><div class="cell good" data-tip="夏・暑い・湿度高い">△</div></td>
+            <td><div class="cell good" data-tip="夏・暑い・湿度高い">△</div></td>
+            <td><div class="cell best" data-tip="秋・快適">◎</div></td>
+            <td><div class="cell best" data-tip="紅葉・最高の季節">◎</div></td>
+            <td><div class="cell good" data-tip="秋終盤・やや寒い">△</div></td>
+            <td><div class="cell good" data-tip="クリスマス・寒い">△</div></td>
+          </tr>
+          <tr data-region="north-america">
+            <td>🇺🇸 ロサンゼルス・西海岸南部</td>
+            <td><div class="cell good" data-tip="涼しい・雨あり">△</div></td>
+            <td><div class="cell good" data-tip="涼しい・雨多い">△</div></td>
+            <td><div class="cell good" data-tip="春の訪れ・雨あり">△</div></td>
+            <td><div class="cell best" data-tip="春・快適">◎</div></td>
+            <td><div class="cell best" data-tip="春・最高の季節">◎</div></td>
+            <td><div class="cell best" data-tip="夏・快適・晴天">◎</div></td>
+            <td><div class="cell best" data-tip="夏・ビーチ・快適">◎</div></td>
+            <td><div class="cell best" data-tip="夏・快適">◎</div></td>
+            <td><div class="cell best" data-tip="秋・快適">◎</div></td>
+            <td><div class="cell best" data-tip="秋・快適・晴天">◎</div></td>
+            <td><div class="cell good" data-tip="秋終盤・快適">△</div></td>
+            <td><div class="cell good" data-tip="涼しい・雨あり">△</div></td>
+          </tr>
+          <tr data-region="north-america">
+            <td>🇺🇸 ハワイ</td>
+            <td><div class="cell good" data-tip="雨多い・やや涼しい">△</div></td>
+            <td><div class="cell good" data-tip="雨多い・やや涼しい">△</div></td>
+            <td><div class="cell best" data-tip="乾季開始・快適">◎</div></td>
+            <td><div class="cell best" data-tip="快適・観光最適">◎</div></td>
+            <td><div class="cell best" data-tip="夏・快適・ビーチ">◎</div></td>
+            <td><div class="cell best" data-tip="夏・快適">◎</div></td>
+            <td><div class="cell best" data-tip="夏・ビーチ最適">◎</div></td>
+            <td><div class="cell best" data-tip="夏・快適">◎</div></td>
+            <td><div class="cell best" data-tip="夏終盤・快適">◎</div></td>
+            <td><div class="cell best" data-tip="快適・観光最適">◎</div></td>
+            <td><div class="cell good" data-tip="雨季開始・やや雨">△</div></td>
+            <td><div class="cell good" data-tip="雨季・やや涼しい">△</div></td>
+          </tr>
+          <tr data-region="north-america">
+            <td>🇺🇸 フロリダ・カリブ海岸</td>
+            <td><div class="cell best" data-tip="乾季・快適">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・最高の時期">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・快適">◎</div></td>
+            <td><div class="cell best" data-tip="乾季終盤・快適">◎</div></td>
+            <td><div class="cell good" data-tip="暑くなる・雨季前">△</div></td>
+            <td><div class="cell avoid" data-tip="雨季・ハリケーンシーズン">×</div></td>
+            <td><div class="cell avoid" data-tip="ハリケーン・豪雨">×</div></td>
+            <td><div class="cell avoid" data-tip="ハリケーンピーク">×</div></td>
+            <td><div class="cell avoid" data-tip="ハリケーン・豪雨">×</div></td>
+            <td><div class="cell good" data-tip="ハリケーン終盤・やや雨">△</div></td>
+            <td><div class="cell best" data-tip="乾季開始・快適">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・快適">◎</div></td>
+          </tr>
+          <tr data-region="north-america">
+            <td>🇨🇦 カナダ（東部・西部）</td>
+            <td><div class="cell avoid" data-tip="厳寒・大雪">×</div></td>
+            <td><div class="cell avoid" data-tip="厳寒・大雪">×</div></td>
+            <td><div class="cell avoid" data-tip="雪解け・ぬかるみ">×</div></td>
+            <td><div class="cell good" data-tip="春の訪れ・やや寒い">△</div></td>
+            <td><div class="cell best" data-tip="春・快適">◎</div></td>
+            <td><div class="cell best" data-tip="夏・快適">◎</div></td>
+            <td><div class="cell best" data-tip="夏・最高の季節">◎</div></td>
+            <td><div class="cell best" data-tip="夏・快適">◎</div></td>
+            <td><div class="cell best" data-tip="秋・紅葉">◎</div></td>
+            <td><div class="cell good" data-tip="秋・やや寒い">△</div></td>
+            <td><div class="cell avoid" data-tip="寒冷・雪">×</div></td>
+            <td><div class="cell avoid" data-tip="厳寒・大雪">×</div></td>
+          </tr>
+          <tr data-region="north-america">
+            <td>🇲🇽 メキシコ</td>
+            <td><div class="cell best" data-tip="乾季・快適">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・最高の時期">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・快適">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・暖かい">◎</div></td>
+            <td><div class="cell good" data-tip="暑くなる・雨季前">△</div></td>
+            <td><div class="cell avoid" data-tip="雨季開始・ハリケーン">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季・ハリケーン">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季ピーク">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季・ハリケーン">×</div></td>
+            <td><div class="cell good" data-tip="雨季終盤・やや雨">△</div></td>
+            <td><div class="cell best" data-tip="乾季開始・快適">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・快適">◎</div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ======================== LATIN AMERICA ======================== -->
+  <div class="region-section" data-region="latin-america">
+    <div class="region-title">🌎 中南米</div>
+    <div class="calendar-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>地域 / 国</th>
+            <th>1月</th><th>2月</th><th>3月</th><th>4月</th>
+            <th>5月</th><th>6月</th><th>7月</th><th>8月</th>
+            <th>9月</th><th>10月</th><th>11月</th><th>12月</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-region="latin-america">
+            <td>🇨🇷 中米（コスタリカ・グアテマラ）</td>
+            <td><div class="cell best" data-tip="乾季・快適">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・最高の時期">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・快適">◎</div></td>
+            <td><div class="cell good" data-tip="乾季終盤・暑い">△</div></td>
+            <td><div class="cell avoid" data-tip="雨季開始">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季・豪雨">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季・豪雨">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季ピーク">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季・最も雨が多い">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季終盤">×</div></td>
+            <td><div class="cell good" data-tip="乾季開始・やや雨">△</div></td>
+            <td><div class="cell best" data-tip="乾季・快適">◎</div></td>
+          </tr>
+          <tr data-region="latin-america">
+            <td>🇨🇴 コロンビア・ペルー（アンデス）</td>
+            <td><div class="cell best" data-tip="乾季・快適">◎</div></td>
+            <td><div class="cell good" data-tip="乾季終盤・やや雨">△</div></td>
+            <td><div class="cell avoid" data-tip="雨季・豪雨">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季・豪雨">×</div></td>
+            <td><div class="cell best" data-tip="乾季開始・快適">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・最高の時期">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・マチュピチュ最適">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・快適">◎</div></td>
+            <td><div class="cell best" data-tip="乾季終盤・快適">◎</div></td>
+            <td><div class="cell avoid" data-tip="雨季開始">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季・豪雨">×</div></td>
+            <td><div class="cell good" data-tip="雨季・やや雨">△</div></td>
+          </tr>
+          <tr data-region="latin-america">
+            <td>🇧🇷 ブラジル（リオ）</td>
+            <td><div class="cell avoid" data-tip="夏・酷暑・豪雨・混雑">×</div></td>
+            <td><div class="cell good" data-tip="カーニバル・暑い">△</div></td>
+            <td><div class="cell good" data-tip="夏終盤・やや雨">△</div></td>
+            <td><div class="cell best" data-tip="秋・快適">◎</div></td>
+            <td><div class="cell best" data-tip="秋・最高の季節">◎</div></td>
+            <td><div class="cell best" data-tip="冬・快適">◎</div></td>
+            <td><div class="cell best" data-tip="冬・乾燥・快適">◎</div></td>
+            <td><div class="cell best" data-tip="冬・快適">◎</div></td>
+            <td><div class="cell best" data-tip="春・快適">◎</div></td>
+            <td><div class="cell best" data-tip="春・快適">◎</div></td>
+            <td><div class="cell good" data-tip="夏開始・暑い">△</div></td>
+            <td><div class="cell avoid" data-tip="夏・酷暑・豪雨">×</div></td>
+          </tr>
+          <tr data-region="latin-america">
+            <td>🇦🇷 アルゼンチン・パタゴニア</td>
+            <td><div class="cell best" data-tip="夏・パタゴニア最適">◎</div></td>
+            <td><div class="cell best" data-tip="夏・快適">◎</div></td>
+            <td><div class="cell best" data-tip="夏終盤・快適">◎</div></td>
+            <td><div class="cell good" data-tip="秋・快適">△</div></td>
+            <td><div class="cell avoid" data-tip="冬・寒冷">×</div></td>
+            <td><div class="cell avoid" data-tip="冬・厳寒">×</div></td>
+            <td><div class="cell avoid" data-tip="冬・厳寒">×</div></td>
+            <td><div class="cell avoid" data-tip="冬・厳寒">×</div></td>
+            <td><div class="cell good" data-tip="春・快適">△</div></td>
+            <td><div class="cell best" data-tip="春・快適">◎</div></td>
+            <td><div class="cell best" data-tip="春・快適">◎</div></td>
+            <td><div class="cell best" data-tip="夏・快適">◎</div></td>
+          </tr>
+          <tr data-region="latin-america">
+            <td>🇨🇺 カリブ海（キューバ・ジャマイカ）</td>
+            <td><div class="cell best" data-tip="乾季・快適">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・最高の時期">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・快適">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・暖かい">◎</div></td>
+            <td><div class="cell good" data-tip="乾季終盤・暑い">△</div></td>
+            <td><div class="cell avoid" data-tip="ハリケーンシーズン">×</div></td>
+            <td><div class="cell avoid" data-tip="ハリケーン・豪雨">×</div></td>
+            <td><div class="cell avoid" data-tip="ハリケーンピーク">×</div></td>
+            <td><div class="cell avoid" data-tip="ハリケーン・豪雨">×</div></td>
+            <td><div class="cell avoid" data-tip="ハリケーン終盤">×</div></td>
+            <td><div class="cell best" data-tip="乾季開始・快適">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・快適">◎</div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ======================== OCEANIA ======================== -->
+  <div class="region-section" data-region="oceania">
+    <div class="region-title">🌊 オセアニア・南太平洋</div>
+    <div class="calendar-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>地域 / 国</th>
+            <th>1月</th><th>2月</th><th>3月</th><th>4月</th>
+            <th>5月</th><th>6月</th><th>7月</th><th>8月</th>
+            <th>9月</th><th>10月</th><th>11月</th><th>12月</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-region="oceania">
+            <td>🇦🇺 オーストラリア（シドニー・メルボルン）</td>
+            <td><div class="cell best" data-tip="夏・快適・ビーチ">◎</div></td>
+            <td><div class="cell best" data-tip="夏・快適">◎</div></td>
+            <td><div class="cell best" data-tip="夏終盤・快適">◎</div></td>
+            <td><div class="cell best" data-tip="秋・快適">◎</div></td>
+            <td><div class="cell best" data-tip="秋終盤・快適">◎</div></td>
+            <td><div class="cell good" data-tip="冬・涼しい">△</div></td>
+            <td><div class="cell good" data-tip="冬・涼しい">△</div></td>
+            <td><div class="cell good" data-tip="冬・涼しい">△</div></td>
+            <td><div class="cell best" data-tip="春・快適">◎</div></td>
+            <td><div class="cell best" data-tip="春・快適">◎</div></td>
+            <td><div class="cell best" data-tip="春・快適">◎</div></td>
+            <td><div class="cell best" data-tip="夏・クリスマス・快適">◎</div></td>
+          </tr>
+          <tr data-region="oceania">
+            <td>🇦🇺 オーストラリア（ケアンズ・北部）</td>
+            <td><div class="cell avoid" data-tip="雨季・サイクロン">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季・サイクロン">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季終盤">×</div></td>
+            <td><div class="cell good" data-tip="乾季開始・快適">△</div></td>
+            <td><div class="cell best" data-tip="乾季・快適">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・最高の時期">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・グレートバリアリーフ">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・快適">◎</div></td>
+            <td><div class="cell best" data-tip="乾季終盤・快適">◎</div></td>
+            <td><div class="cell good" data-tip="雨季開始・やや雨">△</div></td>
+            <td><div class="cell avoid" data-tip="雨季・暑い">×</div></td>
+            <td><div class="cell avoid" data-tip="雨季・サイクロン">×</div></td>
+          </tr>
+          <tr data-region="oceania">
+            <td>🇳🇿 ニュージーランド</td>
+            <td><div class="cell best" data-tip="夏・ハイキング最適">◎</div></td>
+            <td><div class="cell best" data-tip="夏・快適">◎</div></td>
+            <td><div class="cell best" data-tip="夏終盤・快適">◎</div></td>
+            <td><div class="cell good" data-tip="秋・快適">△</div></td>
+            <td><div class="cell good" data-tip="秋終盤・やや寒い">△</div></td>
+            <td><div class="cell avoid" data-tip="冬・寒冷・スキー">×</div></td>
+            <td><div class="cell good" data-tip="冬・スキー・安い">△</div></td>
+            <td><div class="cell good" data-tip="冬・スキー">△</div></td>
+            <td><div class="cell best" data-tip="春・快適">◎</div></td>
+            <td><div class="cell best" data-tip="春・快適">◎</div></td>
+            <td><div class="cell best" data-tip="春・快適">◎</div></td>
+            <td><div class="cell best" data-tip="夏・快適">◎</div></td>
+          </tr>
+          <tr data-region="oceania">
+            <td>🇫🇯 フィジー・南太平洋</td>
+            <td><div class="cell avoid" data-tip="サイクロン・豪雨">×</div></td>
+            <td><div class="cell avoid" data-tip="サイクロン・豪雨">×</div></td>
+            <td><div class="cell avoid" data-tip="サイクロン終盤">×</div></td>
+            <td><div class="cell good" data-tip="乾季開始・やや雨">△</div></td>
+            <td><div class="cell best" data-tip="乾季・快適">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・最高の時期">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・ダイビング最適">◎</div></td>
+            <td><div class="cell best" data-tip="乾季・快適">◎</div></td>
+            <td><div class="cell best" data-tip="乾季終盤・快適">◎</div></td>
+            <td><div class="cell good" data-tip="雨季開始・やや雨">△</div></td>
+            <td><div class="cell avoid" data-tip="雨季・サイクロン">×</div></td>
+            <td><div class="cell avoid" data-tip="サイクロン・豪雨">×</div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>※ このカレンダーは一般的な気候傾向に基づいています。実際の天候は年によって異なります。旅行前に最新の現地情報をご確認ください。</p>
+  <p style="margin-top:6px">◎ ベストシーズン &nbsp;|&nbsp; △ まずまず &nbsp;|&nbsp; × 避けるべき時期</p>
+</footer>
+
+<script>
+  // ===== FILTER BY REGION =====
+  function filterRegion(region, btn) {
+    // Update button state
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    // Show/hide sections
+    document.querySelectorAll('.region-section').forEach(section => {
+      if (region === 'all' || section.dataset.region === region) {
+        section.style.display = '';
+      } else {
+        section.style.display = 'none';
+      }
+    });
+  }
+
+  // ===== HIGHLIGHT MONTH COLUMN =====
+  let activeMonth = null;
+
+  function highlightMonth(monthIndex, btn) {
+    const allMonthBtns = document.querySelectorAll('.month-btn');
+
+    if (activeMonth === monthIndex) {
+      // Deselect
+      activeMonth = null;
+      allMonthBtns.forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('thead th, tbody td').forEach(el => {
+        el.classList.remove('highlight-col');
+      });
+      return;
+    }
+
+    activeMonth = monthIndex;
+    allMonthBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    // Highlight column (monthIndex + 2 because first col is label)
+    document.querySelectorAll('table').forEach(table => {
+      const colIdx = monthIndex + 1; // 0-based: 0=label, 1=Jan, ...
+      table.querySelectorAll('tr').forEach(row => {
+        row.querySelectorAll('th, td').forEach((cell, i) => {
+          cell.classList.remove('highlight-col');
+          if (i === colIdx) {
+            cell.classList.add('highlight-col');
+          }
+        });
+      });
+    });
+  }
+
+  // ===== AUTO HIGHLIGHT CURRENT MONTH =====
+  window.addEventListener('DOMContentLoaded', () => {
+    const currentMonth = new Date().getMonth(); // 0-based
+    const monthBtns = document.querySelectorAll('.month-btn');
+    if (monthBtns[currentMonth]) {
+      highlightMonth(currentMonth, monthBtns[currentMonth]);
+    }
+  });
+</script>
+
+</body>
+</html>
