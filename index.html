@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="世界45地域の旅行ベストシーズンを月別に一覧できるカレンダー。行きたい月から旅行先を探せます。">
+  <meta name="description" content="世界60以上の地域の旅行ベストシーズンを月別に一覧できるカレンダー。行きたい月から旅行先を探せます。">
   <title>世界旅行 ベストシーズンカレンダー</title>
   <style>
     :root {
@@ -454,6 +454,128 @@
       margin-right: 6px;
     }
 
+    /* ===== FAVORITES ===== */
+    .fav-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 0.95rem;
+      padding: 0 6px 0 0;
+      color: #475569;
+      transition: color 0.15s, transform 0.15s;
+    }
+
+    .fav-btn:hover { color: #fbbf24; transform: scale(1.2); }
+    .fav-btn.on { color: #fbbf24; }
+
+    .dest-name { cursor: pointer; }
+    .dest-name:hover { color: var(--accent); text-decoration: underline; }
+
+    #fav-section { display: none; }
+    #fav-section.show { display: block; }
+    #fav-section .region-title { color: #fbbf24; border-left-color: #fbbf24; }
+
+    /* ===== DETAIL MODAL ===== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.75);
+      z-index: 400;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-overlay.show { display: flex; }
+
+    .modal {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      max-width: 560px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 22px 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    }
+
+    .modal h3 { font-size: 1.2rem; margin-bottom: 2px; }
+
+    .modal .modal-region {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      margin-bottom: 12px;
+    }
+
+    .modal-close {
+      float: right;
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      border-radius: 8px;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .modal-close:hover { border-color: var(--accent); color: var(--accent); }
+
+    .modal-best { font-size: 0.82rem; margin-bottom: 14px; }
+    .modal-best b { color: var(--best); }
+
+    .modal-strip {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 3px;
+      margin-bottom: 16px;
+    }
+
+    .modal-strip .ms {
+      border-radius: 6px;
+      text-align: center;
+      padding: 5px 0 3px;
+      font-size: 0.68rem;
+      font-weight: 700;
+    }
+
+    .modal-strip .ms small {
+      display: block;
+      font-size: 0.62rem;
+      font-weight: 600;
+    }
+
+    .modal-strip .ms.r3 { background: var(--best); color: #064e3b; }
+    .modal-strip .ms.r2 { background: var(--good); color: #78350f; }
+    .modal-strip .ms.r1 { background: var(--avoid); color: #7f1d1d; }
+
+    .modal-months { list-style: none; }
+
+    .modal-months li {
+      display: flex;
+      gap: 10px;
+      align-items: baseline;
+      padding: 5px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.82rem;
+    }
+
+    .modal-months li:last-child { border-bottom: none; }
+
+    .modal-months .mm {
+      min-width: 36px;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.75rem;
+    }
+
+    .modal-months .sym { font-weight: 700; min-width: 18px; }
+    .sym.s3 { color: var(--best); }
+    .sym.s2 { color: var(--good); }
+    .sym.s1 { color: var(--avoid); }
+
     /* ===== EMPTY STATE ===== */
     .empty-state {
       display: none;
@@ -501,7 +623,7 @@
 <!-- HERO -->
 <header class="hero">
   <h1><span class="h1-emoji">🌍</span> 世界旅行 ベストシーズンカレンダー</h1>
-  <p>世界45地域の観光ベストシーズンを月別に一覧。「行きたい月」からも「行きたい場所」からも探せます。</p>
+  <p>世界<span id="hero-count">45</span>地域の観光ベストシーズンを月別に一覧。「行きたい月」からも「行きたい場所」からも探せます。</p>
   <div class="legend">
     <div class="legend-item">
       <div class="legend-dot" style="background:var(--best);color:#064e3b">◎</div>
@@ -538,6 +660,7 @@
 <main class="main">
   <div class="stats-bar" id="stats"></div>
   <div class="recommend" id="recommend" aria-live="polite"></div>
+  <div id="fav-section"></div>
   <div id="sections"></div>
   <div class="empty-state" id="empty">
     <div class="big">🧳</div>
@@ -553,6 +676,10 @@
 </footer>
 
 <div id="tooltip" role="tooltip"></div>
+
+<div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true">
+  <div class="modal" id="modal"></div>
+</div>
 
 <script>
 // ===================== DATA =====================
@@ -615,6 +742,23 @@ const DATA = [
   { r: "oceania", n: "🇦🇺 オーストラリア（ケアンズ・北部）", m: [[1,"雨季・サイクロン"],[1,"雨季・サイクロン"],[1,"雨季終盤"],[2,"乾季開始・快適"],[3,"乾季・快適"],[3,"乾季・最高の時期"],[3,"乾季・グレートバリアリーフ"],[3,"乾季・快適"],[3,"乾季終盤・快適"],[2,"雨季開始・やや雨"],[1,"雨季・暑い"],[1,"雨季・サイクロン"]] },
   { r: "oceania", n: "🇳🇿 ニュージーランド", m: [[3,"夏・ハイキング最適"],[3,"夏・快適"],[3,"夏終盤・快適"],[2,"秋・快適"],[2,"秋終盤・やや寒い"],[1,"冬・寒冷・スキー"],[2,"冬・スキー・安い"],[2,"冬・スキー"],[3,"春・快適"],[3,"春・快適"],[3,"春・快適"],[3,"夏・快適"]] },
   { r: "oceania", n: "🇫🇯 フィジー・南太平洋", m: [[1,"サイクロン・豪雨"],[1,"サイクロン・豪雨"],[1,"サイクロン終盤"],[2,"乾季開始・やや雨"],[3,"乾季・快適"],[3,"乾季・最高の時期"],[3,"乾季・ダイビング最適"],[3,"乾季・快適"],[3,"乾季終盤・快適"],[2,"雨季開始・やや雨"],[1,"雨季・サイクロン"],[1,"サイクロン・豪雨"]] },
+  { r: "east-asia", n: "🇯🇵 沖縄", m: [[2,"曇りがち・涼しい"],[2,"ホエールウォッチング"],[3,"海開き・過ごしやすい"],[3,"梅雨前・ベスト"],[1,"梅雨入り"],[2,"下旬に梅雨明け"],[3,"夏本番・ビーチ最適"],[2,"ハイシーズン・台風リスク"],[1,"台風ピーク"],[3,"台風減・快適"],[3,"快適・混雑少ない"],[2,"涼しい・オフシーズン"]] },
+  { r: "east-asia", n: "🇲🇳 モンゴル", m: [[1,"厳寒・-30℃"],[1,"厳寒"],[1,"寒い・砂嵐"],[1,"砂嵐・寒暖差大"],[2,"春・遊牧再開"],[3,"草原の緑・快適"],[3,"ナーダム祭・ベスト"],[3,"草原・乗馬最適"],[2,"秋・冷え込む"],[1,"寒冷"],[1,"厳寒"],[1,"厳寒"]] },
+  { r: "southeast-asia", n: "🇹🇭 タイ（プーケット）", m: [[3,"乾季・海最高"],[3,"乾季・ベスト"],[3,"乾季・暑い"],[2,"暑季・ソンクラーン"],[1,"雨季開始"],[1,"雨季・高波"],[1,"雨季・遊泳注意"],[1,"雨季・高波"],[1,"雨季ピーク"],[1,"雨季終盤"],[2,"乾季へ移行"],[3,"乾季・ハイシーズン"]] },
+  { r: "southeast-asia", n: "🇱🇦 ラオス", m: [[3,"乾季・涼しい"],[3,"乾季・ベスト"],[2,"暑季・野焼きの霞"],[1,"酷暑・ラオス正月"],[1,"雨季開始"],[1,"雨季"],[1,"雨季・豪雨"],[1,"雨季ピーク"],[1,"雨季終盤"],[2,"雨季明け・緑豊か"],[3,"乾季・快適"],[3,"乾季・観光最適"]] },
+  { r: "south-asia", n: "🇲🇻 モルディブ", m: [[3,"乾季・ベスト"],[3,"乾季・透明度最高"],[3,"乾季・快適"],[3,"乾季終盤"],[1,"雨季開始"],[1,"雨季・スコール"],[2,"晴れ間もあり・価格安い"],[2,"雨季・マンタシーズン"],[1,"雨季・雨多い"],[1,"雨季"],[2,"雨季終盤・移行期"],[3,"乾季開始・年末は高騰"]] },
+  { r: "south-asia", n: "🇧🇹 ブータン", m: [[2,"冬・晴天だが寒い"],[2,"冬・寒い"],[3,"春・花の季節"],[3,"春・ツェチュ祭"],[2,"春終盤・雨増える"],[1,"モンスーン"],[1,"モンスーン・豪雨"],[1,"モンスーン"],[3,"秋・晴天"],[3,"秋・ツェチュ祭・ベスト"],[3,"秋・ヒマラヤ絶景"],[2,"冬・晴天・寒い"]] },
+  { r: "middle-east", n: "🇴🇲 オマーン", m: [[3,"快適・ベスト"],[3,"快適"],[3,"快適・暖かい"],[2,"暑くなる"],[1,"酷暑"],[1,"酷暑"],[1,"酷暑・サラーラのみ緑"],[1,"酷暑"],[1,"酷暑・和らぎ始め"],[3,"快適・観光再開"],[3,"快適・ベスト"],[3,"快適"]] },
+  { r: "europe", n: "🇮🇸 アイスランド", m: [[2,"オーロラ・氷の洞窟"],[2,"オーロラ・氷の洞窟"],[2,"オーロラ終盤・日照回復"],[2,"春・雪解け"],[2,"日照長い・ハイランド閉鎖中"],[3,"白夜・ベスト"],[3,"白夜・ハイランド開通"],[3,"夏・パフィン観察"],[2,"秋・オーロラ開始"],[2,"紅葉・オーロラ"],[1,"嵐・暗い"],[1,"暗い・道路閉鎖多い"]] },
+  { r: "europe", n: "🇵🇹 ポルトガル", m: [[1,"雨季・肌寒い"],[1,"雨多い"],[2,"春の訪れ"],[3,"春・快適"],[3,"春・ベスト"],[3,"初夏・快適"],[2,"暑い・観光ピーク"],[2,"酷暑・混雑"],[3,"秋・快適・海も暖かい"],[3,"秋・ベスト"],[2,"秋終盤・雨増える"],[1,"雨季"]] },
+  { r: "europe", n: "🇨🇭 スイス（アルプス）", m: [[2,"スキーシーズン"],[2,"スキー・晴天多い"],[2,"春スキー"],[1,"端境期・リフト休止"],[2,"新緑・一部登山道閉鎖"],[3,"ハイキング開始"],[3,"ハイキング・ベスト"],[3,"高山植物・絶景"],[3,"晴天多い・快適"],[2,"紅葉・冷え込む"],[1,"端境期・霧"],[2,"スキー開始・クリスマス"]] },
+  { r: "africa", n: "🇲🇬 マダガスカル", m: [[1,"雨季・サイクロン"],[1,"雨季・サイクロン"],[1,"雨季終盤"],[2,"乾季へ移行"],[3,"乾季・快適"],[3,"乾季・冬"],[3,"乾季・ホエールウォッチング"],[3,"乾季・快適"],[3,"バオバブ・キツネザル"],[3,"乾季終盤・暖かい"],[2,"雨季前・暑い"],[1,"雨季開始"]] },
+  { r: "africa", n: "🇳🇦 ナミビア", m: [[1,"夏・酷暑・雨"],[1,"雨季"],[2,"雨季終盤・緑"],[2,"乾季へ移行"],[3,"乾季・サファリ最適"],[3,"乾季・動物が水場に集中"],[3,"乾季・ベスト"],[3,"乾季・サファリ最高"],[3,"乾季・暑くなる"],[2,"酷暑・乾季終盤"],[1,"酷暑・雨季前"],[1,"夏・暑い"]] },
+  { r: "north-america", n: "🇺🇸 アラスカ", m: [[2,"オーロラ・極寒"],[2,"オーロラ・犬ぞり"],[2,"オーロラベスト・日照回復"],[1,"雪解け・端境期"],[2,"春・日照長い"],[3,"夏・デナリ・白夜"],[3,"夏・クルーズ最盛期"],[3,"夏・野生動物"],[2,"紅葉・オーロラ開始"],[1,"端境期・寒い"],[1,"寒冷・暗い"],[1,"極寒・日照短い"]] },
+  { r: "latin-america", n: "🇧🇴 ボリビア（ウユニ塩湖）", m: [[3,"雨季・鏡張りベスト"],[3,"鏡張り"],[2,"雨季終盤・鏡張り残る"],[2,"移行期"],[3,"乾季・星空"],[3,"乾季・晴天"],[3,"乾季・ベスト"],[3,"乾季・晴天"],[2,"乾季終盤"],[2,"暑い・乾燥"],[2,"雨季前"],[2,"雨季開始・鏡張り始まる"]] },
+  { r: "latin-america", n: "🇪🇨 エクアドル・ガラパゴス", m: [[3,"温暖・海穏やか"],[3,"温暖・ベスト"],[3,"温暖・晴天"],[3,"温暖・海快適"],[3,"温暖期終盤"],[2,"ガルーア季・涼しい"],[2,"涼しい・野生動物豊富"],[2,"海流豊か・ダイビング"],[1,"海況荒れやすい"],[2,"涼しい・霧"],[2,"移行期"],[3,"温暖期開始"]] },
+  { r: "oceania", n: "🇬🇺 グアム・サイパン", m: [[3,"乾季・ベスト"],[3,"乾季・快適"],[3,"乾季・海最高"],[3,"乾季・快適"],[3,"乾季終盤"],[2,"雨季へ移行"],[1,"雨季・台風"],[1,"台風シーズン"],[1,"台風ピーク"],[1,"雨季・台風"],[2,"雨季終盤"],[3,"乾季開始・快適"]] },
+  { r: "oceania", n: "🇵🇫 タヒチ・ポリネシア", m: [[1,"雨季・蒸し暑い"],[1,"雨季・サイクロン注意"],[1,"雨季"],[2,"乾季へ移行"],[3,"乾季・快適"],[3,"乾季・ベスト"],[3,"乾季・ヘイヴァ祭"],[3,"乾季・ホエールウォッチング"],[3,"乾季・快適"],[2,"乾季終盤"],[1,"雨季開始"],[1,"雨季・蒸し暑い"]] },
 ];
 
 const MONTH_NAMES = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
@@ -629,27 +773,72 @@ const state = {
   query: '',
 };
 
+// ===================== FAVORITES: STATE =====================
+const FAVS = new Set(JSON.parse(localStorage.getItem('wtsc-favs') || '[]'));
+
+function saveFavs() {
+  localStorage.setItem('wtsc-favs', JSON.stringify([...FAVS]));
+}
+
+// ===================== RENDER: SHARED PARTS =====================
+function cellsHtml(d) {
+  return d.m.map(([rating, tip], mi) =>
+    `<td data-m="${mi}"><div class="cell r${rating}" tabindex="0" data-tip="${tip}" data-mi="${mi}" role="img" aria-label="${d.n} ${MONTH_NAMES[mi]}: ${RATING_LABELS[rating]}（${tip}）">${SYMBOLS[rating]}</div></td>`
+  ).join('');
+}
+
+function nameCellHtml(idx) {
+  const d = DATA[idx];
+  const on = FAVS.has(d.n);
+  return `<td><button class="fav-btn${on ? ' on' : ''}" data-fi="${idx}" aria-pressed="${on}" title="お気に入りに追加/解除">★</button><span class="dest-name" data-di="${idx}" title="クリックで詳細表示">${d.n}</span></td>`;
+}
+
+function theadHtml() {
+  return `<thead><tr><th>地域 / 国</th>${MONTH_NAMES.map((m, i) => `<th data-m="${i}">${m}</th>`).join('')}</tr></thead>`;
+}
+
 // ===================== RENDER: SECTIONS =====================
 function renderSections() {
   const container = document.getElementById('sections');
   container.innerHTML = REGIONS.map(region => {
-    const rows = DATA.filter(d => d.r === region.k).map((d, i) => {
-      const idx = DATA.indexOf(d);
-      const cells = d.m.map(([rating, tip], mi) =>
-        `<td data-m="${mi}"><div class="cell r${rating}" tabindex="0" data-tip="${tip}" data-mi="${mi}" role="img" aria-label="${d.n} ${MONTH_NAMES[mi]}: ${RATING_LABELS[rating]}（${tip}）">${SYMBOLS[rating]}</div></td>`
-      ).join('');
-      return `<tr data-idx="${idx}" data-region="${d.r}" id="dest-${idx}"><td>${d.n}</td>${cells}</tr>`;
-    }).join('');
+    const rows = DATA.map((d, idx) => ({ d, idx }))
+      .filter(({ d }) => d.r === region.k)
+      .map(({ d, idx }) => `<tr data-idx="${idx}" data-region="${d.r}" id="dest-${idx}">${nameCellHtml(idx)}${cellsHtml(d)}</tr>`)
+      .join('');
     return `<section class="region-section" data-region="${region.k}">
       <h2 class="region-title">${region.t}</h2>
       <div class="calendar-wrapper">
-        <table>
-          <thead><tr><th>地域 / 国</th>${MONTH_NAMES.map((m, i) => `<th data-m="${i}">${m}</th>`).join('')}</tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
+        <table>${theadHtml()}<tbody>${rows}</tbody></table>
       </div>
     </section>`;
   }).join('');
+}
+
+// ===================== RENDER: FAVORITES SECTION =====================
+function renderFavSection() {
+  const sec = document.getElementById('fav-section');
+  const favs = DATA.map((d, i) => ({ d, i })).filter(({ d }) => FAVS.has(d.n));
+  sec.classList.toggle('show', favs.length > 0);
+  if (!favs.length) { sec.innerHTML = ''; return; }
+  const rows = favs.map(({ d, i }) => `<tr data-fav-row>${nameCellHtml(i)}${cellsHtml(d)}</tr>`).join('');
+  sec.innerHTML = `<section class="region-section">
+    <h2 class="region-title">⭐ お気に入り比較（${favs.length}件）</h2>
+    <div class="calendar-wrapper">
+      <table>${theadHtml()}<tbody>${rows}</tbody></table>
+    </div>
+  </section>`;
+}
+
+function toggleFav(idx) {
+  const name = DATA[idx].n;
+  const on = !FAVS.has(name);
+  if (on) FAVS.add(name); else FAVS.delete(name);
+  saveFavs();
+  document.querySelectorAll(`.fav-btn[data-fi="${idx}"]`).forEach(b => {
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', on);
+  });
+  applyFilters(); // お気に入りテーブルの再構築と列ハイライトの再適用
 }
 
 // ===================== RENDER: FILTER BUTTONS =====================
@@ -689,6 +878,8 @@ function renderFilters() {
 // ===================== APPLY FILTERS =====================
 function applyFilters() {
   const q = state.query.toLowerCase();
+
+  renderFavSection(); // 先に再構築（後段の列ハイライトを効かせるため）
 
   // region buttons
   document.querySelectorAll('#region-btns .filter-btn').forEach(b =>
@@ -807,6 +998,41 @@ document.addEventListener('focusin', e => {
 });
 window.addEventListener('scroll', hideTooltip, { passive: true });
 
+// ===================== DETAIL MODAL =====================
+const modalOverlay = document.getElementById('modal-overlay');
+const modalEl = document.getElementById('modal');
+
+function openModal(idx) {
+  const d = DATA[idx];
+  const region = REGIONS.find(r => r.k === d.r);
+  const bestMonths = d.m.map(([r], i) => r === 3 ? (i + 1) + '月' : null).filter(Boolean);
+  modalEl.innerHTML = `
+    <button class="modal-close" aria-label="閉じる">✕</button>
+    <h3>${d.n}</h3>
+    <div class="modal-region">${region ? region.t : ''}</div>
+    <div class="modal-best">ベストシーズン: <b>${bestMonths.join('・') || 'なし'}</b></div>
+    <div class="modal-strip">${d.m.map(([r], i) =>
+      `<div class="ms r${r}">${i + 1}<small>${SYMBOLS[r]}</small></div>`).join('')}</div>
+    <ul class="modal-months">${d.m.map(([r, tip], i) =>
+      `<li><span class="mm">${MONTH_NAMES[i]}</span><span class="sym s${r}">${SYMBOLS[r]}</span><span>${tip}</span></li>`).join('')}</ul>`;
+  modalOverlay.classList.add('show');
+  modalEl.querySelector('.modal-close').focus();
+}
+
+function closeModal() { modalOverlay.classList.remove('show'); }
+
+modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) closeModal(); });
+modalEl.addEventListener('click', e => { if (e.target.closest('.modal-close')) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ===================== FAV / DETAIL CLICK DELEGATION =====================
+document.addEventListener('click', e => {
+  const favBtn = e.target.closest('.fav-btn');
+  if (favBtn) { toggleFav(Number(favBtn.dataset.fi)); return; }
+  const name = e.target.closest('.dest-name');
+  if (name) openModal(Number(name.dataset.di));
+});
+
 // ===================== URL HASH SYNC =====================
 let hashSyncEnabled = false;
 
@@ -843,6 +1069,7 @@ window.addEventListener('scroll', () => {
 }, { passive: true });
 
 // ===================== INIT =====================
+document.getElementById('hero-count').textContent = DATA.length;
 renderSections();
 renderFilters();
 if (!loadHash()) {
