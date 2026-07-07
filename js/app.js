@@ -243,7 +243,8 @@ function openModal(idx) {
     <div class="modal-strip">${d.m.map(([r], i) =>
       `<div class="ms r${r}">${i + 1}<small>${SYMBOLS[r]}</small></div>`).join('')}</div>
     <ul class="modal-months">${d.m.map(([r, tip], i) =>
-      `<li><span class="mm">${MONTH_NAMES[i]}</span><span class="sym s${r}">${SYMBOLS[r]}</span><span>${tip}</span></li>`).join('')}</ul>`;
+      `<li><span class="mm">${MONTH_NAMES[i]}</span><span class="sym s${r}">${SYMBOLS[r]}</span><span>${tip}</span></li>`).join('')}</ul>
+    <div class="modal-actions"><button data-plan="${idx}">🧳 この行き先で計画する（費用・持ち物へ反映）</button></div>`;
   modalOverlay.classList.add('show');
   modalEl.querySelector('.modal-close').focus();
   emitAtlasEvent('destination:view', { name: d.n });
@@ -252,7 +253,14 @@ function openModal(idx) {
 function closeModal() { modalOverlay.classList.remove('show'); }
 
 modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) closeModal(); });
-modalEl.addEventListener('click', e => { if (e.target.closest('.modal-close')) closeModal(); });
+modalEl.addEventListener('click', e => {
+  if (e.target.closest('.modal-close')) closeModal();
+  const planBtn = e.target.closest('[data-plan]');
+  if (planBtn) {
+    closeModal();
+    planTrip(Number(planBtn.dataset.plan), state.month !== null ? state.month : new Date().getMonth());
+  }
+});
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
 // ===================== FAV / DETAIL CLICK DELEGATION =====================
@@ -366,6 +374,9 @@ function initRoulette() {
 
   rouletteSpinBtn.addEventListener('click', spinRoulette);
   document.getElementById('result-again').addEventListener('click', spinRoulette);
+  document.getElementById('result-plan').addEventListener('click', () => {
+    if (rouletteWinnerIdx !== null) planTrip(rouletteWinnerIdx, Number(rouletteMonthSel.value));
+  });
   document.getElementById('result-detail').addEventListener('click', () => {
     if (rouletteWinnerIdx !== null) openModal(rouletteWinnerIdx);
   });
@@ -671,6 +682,53 @@ function renderPacking() {
   const pct = total ? Math.round(done / total * 100) : 0;
   document.getElementById('packing-progress-fill').style.width = pct + '%';
   document.getElementById('packing-progress-label').textContent = `${done} / ${total}（${pct}%）`;
+}
+
+// ===================== TRIP PLANNING（ルーレット/詳細 → 費用・持ち物・地図の連携） =====================
+const CLIMATE_NAMES = { hot: '☀️ 暑い地域・ビーチ', cold: '❄️ 寒い地域・雪', rain: '🌧️ 雨季・スコール' };
+
+// 行き先×月から必要な追加装備を推定（月の理由テキスト + 緯度のヒューリスティック）
+function inferClimates(d, month) {
+  const tip = d.m[month][1];
+  const out = [];
+  if (/暑|ビーチ|海|常夏|乾季/.test(tip) || (d.g && Math.abs(d.g[0]) < 20)) out.push('hot');
+  if (/寒|雪|氷|オーロラ|スキー|冬/.test(tip)) out.push('cold');
+  if (/雨|モンスーン|スコール|台風|ハリケーン|サイクロン|梅雨/.test(tip)) out.push('rain');
+  return out;
+}
+
+function planTrip(idx, month) {
+  const d = DATA[idx];
+
+  // 1) 費用シミュレーターに目的地をセット
+  document.getElementById('budget-dest').value = idx;
+  updateBudget();
+
+  // 2) 持ち物リストの気候装備を推定してON
+  const climates = inferClimates(d, month);
+  CLIMATES_ON.clear();
+  climates.forEach(c => CLIMATES_ON.add(c));
+  saveClimates();
+  document.querySelectorAll('.climate-btn').forEach(b =>
+    b.classList.toggle('active', CLIMATES_ON.has(b.dataset.climate)));
+  if (!activePackCategories().some(c => c.id === activePackTab)) activePackTab = PACKING[0].id;
+  renderPacking();
+
+  // 3) 地図を行き先へパン
+  if (map && d.g) map.setView(d.g, 4);
+
+  // 4) 計画バナーを表示して費用セクションへ
+  const banner = document.getElementById('plan-banner');
+  banner.innerHTML =
+    `🧳 <b>${d.n}</b>（${month + 1}月出発想定）の計画を開始しました。` +
+    (climates.length
+      ? `持ち物リストに <b>${climates.map(c => CLIMATE_NAMES[c]).join('・')}</b> の装備を追加済み。`
+      : '') +
+    ` <a href="#packing-section">持ち物リストへ →</a>`;
+  banner.hidden = false;
+  document.getElementById('budget-section').scrollIntoView({ behavior: 'smooth' });
+
+  emitAtlasEvent('plan:start', { name: d.n, month: month + 1, climates });
 }
 
 // ===================== INIT =====================

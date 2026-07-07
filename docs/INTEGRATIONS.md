@@ -17,6 +17,7 @@
 | `atlas:favorite:toggle` | `{ name, on }` | お気に入りの追加（on=true）/ 解除 |
 | `atlas:destination:view` | `{ name }` | 地域の詳細モーダルを開いた時 |
 | `atlas:budget:update` | `{ dest, days, style, total }` | 費用シミュレーターの再計算時 |
+| `atlas:plan:start` | `{ name, month, climates }` | 「この行き先で計画する」実行時（費用・持ち物へ反映） |
 
 ```js
 document.addEventListener('atlas:roulette:result', e => {
