@@ -13,6 +13,11 @@ const state = {
   query: '',
 };
 
+// ===================== EVENT BUS（外部連携フック / js/integrations.js が購読） =====================
+function emitAtlasEvent(name, detail) {
+  document.dispatchEvent(new CustomEvent('atlas:' + name, { detail }));
+}
+
 // ===================== FAVORITES: STATE =====================
 const FAVS = new Set(JSON.parse(localStorage.getItem('wtsc-favs') || '[]'));
 
@@ -88,6 +93,7 @@ function toggleFav(idx) {
     b.classList.toggle('on', on);
     b.setAttribute('aria-pressed', on);
   });
+  emitAtlasEvent('favorite:toggle', { name, on });
   applyFilters(); // お気に入りテーブルの再構築と列ハイライトの再適用
 }
 
@@ -240,6 +246,7 @@ function openModal(idx) {
       `<li><span class="mm">${MONTH_NAMES[i]}</span><span class="sym s${r}">${SYMBOLS[r]}</span><span>${tip}</span></li>`).join('')}</ul>`;
   modalOverlay.classList.add('show');
   modalEl.querySelector('.modal-close').focus();
+  emitAtlasEvent('destination:view', { name: d.n });
 }
 
 function closeModal() { modalOverlay.classList.remove('show'); }
@@ -435,6 +442,7 @@ function showRouletteResult({ d, i }, m) {
     `<div class="ms r${r}">${k + 1}<br>${SYMBOLS[r]}</div>`).join('');
   updateResultFavBtn();
   rouletteResult.hidden = false;
+  emitAtlasEvent('roulette:result', { name: d.n, month: m + 1 });
 }
 
 // ===================== ROUTE MAP =====================
@@ -573,6 +581,8 @@ function updateBudget() {
   document.getElementById('budget-total').textContent =
     man >= 100 ? `${Math.round(man)}万円` : `${(Math.round(man * 10) / 10).toFixed(1)}万円`;
 
+  emitAtlasEvent('budget:update', { dest: d.n, days, style, total: Math.round(b.total) });
+
   const max = Math.max(...BUDGET_CATS.map(c => b[c.key]));
   document.getElementById('budget-bars').innerHTML = BUDGET_CATS.map(c => `
     <div class="budget-bar-row">
@@ -666,6 +676,9 @@ function renderPacking() {
 // ===================== INIT =====================
 document.getElementById('hero-count').textContent = DATA.length;
 document.getElementById('hero-stat-dest').textContent = DATA.length;
+if (typeof SITE_CONFIG !== 'undefined') {
+  document.getElementById('site-version').textContent = 'v' + SITE_CONFIG.version;
+}
 initRoulette();
 renderSections();
 renderFilters();

@@ -3,8 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="世界60以上の地域の旅行ベストシーズンを月別に一覧できるカレンダー。行きたい月から旅行先を探せます。">
-  <title>世界旅行 ベストシーズンカレンダー</title>
+
+  <!-- ============ SITE CONFIG（ドメイン変更時はこのブロックと js/config.js / robots.txt / sitemap.xml を更新。手順: docs/DEPLOY.md） ============ -->
+  <title>SEASON ATLAS — 世界旅行ベストシーズンカレンダー | 行き先ルーレット・費用シミュレーター</title>
+  <meta name="description" content="世界62地域の旅行ベストシーズンを月別に一覧。行きたい月とエリアで回す行き先ルーレット、世界地図の周遊ルートマップ、費用シミュレーター、持ち物チェックリストで次の旅を計画できます。">
+  <link rel="canonical" href="https://ryuyasuginaka.github.io/world-travel-season-calendar/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="SEASON ATLAS">
+  <meta property="og:title" content="SEASON ATLAS — 世界旅行ベストシーズンカレンダー">
+  <meta property="og:description" content="「いつ行くか」で旅は決まる。世界62地域のベストシーズン一覧と行き先ルーレットで、次の旅先と出会う。">
+  <meta property="og:url" content="https://ryuyasuginaka.github.io/world-travel-season-calendar/">
+  <meta property="og:image" content="https://ryuyasuginaka.github.io/world-travel-season-calendar/assets/ogp.jpg">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary_large_image">
+  <!-- ============ /SITE CONFIG ============ -->
+
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <meta name="theme-color" content="#1c2a4a">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "SEASON ATLAS — 世界旅行ベストシーズンカレンダー",
+    "url": "https://ryuyasuginaka.github.io/world-travel-season-calendar/",
+    "applicationCategory": "TravelApplication",
+    "operatingSystem": "Web",
+    "inLanguage": "ja",
+    "description": "世界62地域の旅行ベストシーズンを月別に一覧できるカレンダー。行き先ルーレット・ルートマップ・費用シミュレーター・持ち物リスト付き。",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "JPY" }
+  }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Montserrat:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Bebas+Neue&family=Noto+Serif+JP:wght@500;600;700&display=swap" rel="stylesheet">
@@ -234,7 +262,7 @@
   <div class="foot-logo">🧭 SEASON ATLAS</div>
   <p>※ このカレンダーは一般的な気候傾向に基づいています。実際の天候は年によって異なります。旅行前に最新の現地情報をご確認ください。</p>
   <p>◎ ベストシーズン ｜ △ まずまず ｜ × 避けるべき時期</p>
-  <p>Hero Photo: <a href="https://commons.wikimedia.org/wiki/File:Hot_air_balloon_ride_at_sunrise_in_Cappadocia.JPG" target="_blank" rel="noopener">Wolfgang Moroder</a> (CC BY-SA 3.0) ｜ <a href="https://github.com/ryuyasuginaka/world-travel-season-calendar" target="_blank" rel="noopener">GitHub</a></p>
+  <p>Hero Photo: <a href="https://commons.wikimedia.org/wiki/File:Hot_air_balloon_ride_at_sunrise_in_Cappadocia.JPG" target="_blank" rel="noopener">Wolfgang Moroder</a> (CC BY-SA 3.0) ｜ <a href="https://github.com/ryuyasuginaka/world-travel-season-calendar" target="_blank" rel="noopener">GitHub</a> ｜ MIT License ｜ <span id="site-version"></span></p>
 </footer>
 
 <div id="tooltip" role="tooltip"></div>
@@ -244,8 +272,10 @@
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="js/config.js"></script>
 <script src="js/data.js"></script>
 <script src="js/app.js"></script>
+<script src="js/integrations.js"></script>
 
 </body>
 </html>

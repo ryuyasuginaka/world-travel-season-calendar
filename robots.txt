@@ -1,0 +1,6 @@
+# SEASON ATLAS
+# ドメイン変更時は Sitemap のURLを更新すること（docs/DEPLOY.md 参照）
+User-agent: *
+Allow: /
+
+Sitemap: https://ryuyasuginaka.github.io/world-travel-season-calendar/sitemap.xml
