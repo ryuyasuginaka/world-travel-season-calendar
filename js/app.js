@@ -335,9 +335,108 @@ function setupReveal() {
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 }
 
+// ===================== ROULETTE =====================
+const rouletteMonthSel = document.getElementById('roulette-month');
+const rouletteAreaSel = document.getElementById('roulette-area');
+const rouletteSpinBtn = document.getElementById('roulette-spin');
+const reelStrip = document.getElementById('reel-strip');
+const rouletteResult = document.getElementById('roulette-result');
+const rouletteEmpty = document.getElementById('roulette-empty');
+const REEL_CELL_H = 110;
+let rouletteWinnerIdx = null;
+let spinning = false;
+
+function initRoulette() {
+  rouletteMonthSel.innerHTML = MONTH_NAMES.map((m, i) => `<option value="${i}">${m}</option>`).join('');
+  rouletteMonthSel.value = new Date().getMonth();
+  rouletteAreaSel.innerHTML = `<option value="all">すべてのエリア</option>` +
+    REGIONS.map(r => `<option value="${r.k}">${jpName(r.t)}</option>`).join('');
+  reelStrip.innerHTML = `<div class="reel-placeholder">Press Spin</div>`;
+
+  rouletteSpinBtn.addEventListener('click', spinRoulette);
+  document.getElementById('result-again').addEventListener('click', spinRoulette);
+  document.getElementById('result-detail').addEventListener('click', () => {
+    if (rouletteWinnerIdx !== null) openModal(rouletteWinnerIdx);
+  });
+  document.getElementById('result-fav').addEventListener('click', () => {
+    if (rouletteWinnerIdx === null) return;
+    toggleFav(rouletteWinnerIdx);
+    updateResultFavBtn();
+  });
+}
+
+function updateResultFavBtn() {
+  const btn = document.getElementById('result-fav');
+  const on = rouletteWinnerIdx !== null && FAVS.has(DATA[rouletteWinnerIdx].n);
+  btn.classList.toggle('faved', on);
+  btn.textContent = on ? '★ お気に入り登録済み' : '★ お気に入りに追加';
+}
+
+function spinRoulette() {
+  if (spinning) return;
+  const m = Number(rouletteMonthSel.value);
+  const area = rouletteAreaSel.value;
+  const pool = DATA.map((d, i) => ({ d, i }))
+    .filter(({ d }) => d.m[m][0] === 3 && (area === 'all' || d.r === area));
+
+  rouletteResult.hidden = true;
+  if (!pool.length) {
+    rouletteEmpty.hidden = false;
+    reelStrip.innerHTML = `<div class="reel-placeholder">No Match</div>`;
+    return;
+  }
+  rouletteEmpty.hidden = true;
+
+  const winner = pool[Math.floor(Math.random() * pool.length)];
+  rouletteWinnerIdx = winner.i;
+
+  // リール構築: ランダムセルの後に当選セル
+  const TOTAL = 22;
+  const cells = [];
+  for (let k = 0; k < TOTAL - 1; k++) cells.push(pool[Math.floor(Math.random() * pool.length)]);
+  cells.push(winner);
+  reelStrip.style.transition = 'none';
+  reelStrip.style.transform = 'translateY(0)';
+  reelStrip.innerHTML = cells.map(({ d }) => {
+    const sp = d.n.indexOf(' ');
+    return `<div class="reel-cell"><span class="flag">${d.n.slice(0, sp)}</span><span>${d.n.slice(sp + 1)}</span></div>`;
+  }).join('');
+
+  spinning = true;
+  rouletteSpinBtn.disabled = true;
+
+  void reelStrip.offsetHeight; // 強制リフロー（transition:none を確定させる）
+  reelStrip.style.transition = 'transform 3s cubic-bezier(0.12, 0.6, 0.15, 1)';
+  reelStrip.style.transform = `translateY(-${(TOTAL - 1) * REEL_CELL_H}px)`;
+
+  // transitionend はタブ非表示時などに落ちることがあるためタイムアウトでも完了させる
+  let finished = false;
+  const finish = () => {
+    if (finished) return;
+    finished = true;
+    spinning = false;
+    rouletteSpinBtn.disabled = false;
+    showRouletteResult(winner, m);
+  };
+  reelStrip.addEventListener('transitionend', finish, { once: true });
+  setTimeout(finish, 3400);
+}
+
+function showRouletteResult({ d, i }, m) {
+  document.getElementById('result-name').textContent = d.n;
+  const region = REGIONS.find(r => r.k === d.r);
+  document.getElementById('result-region').textContent = region ? `${region.e} — ${jpName(region.t)}` : '';
+  document.getElementById('result-tip').innerHTML = `<b>${m + 1}月:</b> ${d.m[m][1]}`;
+  document.getElementById('result-strip').innerHTML = d.m.map(([r], k) =>
+    `<div class="ms r${r}">${k + 1}<br>${SYMBOLS[r]}</div>`).join('');
+  updateResultFavBtn();
+  rouletteResult.hidden = false;
+}
+
 // ===================== INIT =====================
 document.getElementById('hero-count').textContent = DATA.length;
 document.getElementById('hero-stat-dest').textContent = DATA.length;
+initRoulette();
 renderSections();
 renderFilters();
 if (!loadHash()) {

@@ -17,8 +17,8 @@
   <div class="nav-inner">
     <a href="#" class="nav-logo">🧭 SEASON ATLAS</a>
     <div class="nav-links">
-      <a href="#overview">カレンダー</a>
-      <a href="#recommend">今月のおすすめ</a>
+      <a href="#roulette">ルーレット</a>
+      <a href="#calendar-block">カレンダー</a>
       <a href="#fav-section">お気に入り</a>
     </div>
   </div>
@@ -44,6 +44,56 @@
   </div>
   <div class="hero-scroll"><span>Scroll</span><div class="chev"></div></div>
 </header>
+
+<!-- ROULETTE -->
+<section class="roulette" id="roulette">
+  <div class="roulette-inner">
+    <div class="section-label gold-label">Spin the Globe</div>
+    <h2>行き先ルーレット</h2>
+    <div class="accent-line gold-line"></div>
+    <p class="roulette-lead">行きたい月とエリアを選んでルーレットを回すと、その条件で「◎ ベストシーズン」の地域からランダムに行き先が飛び出します。<br>選ぶのではなく、出会う。</p>
+
+    <div class="roulette-controls">
+      <label class="roulette-field">
+        <span>月</span>
+        <select id="roulette-month"></select>
+      </label>
+      <label class="roulette-field">
+        <span>エリア</span>
+        <select id="roulette-area"></select>
+      </label>
+      <button id="roulette-spin" class="spin-btn">🎰 ルーレットを回す</button>
+    </div>
+
+    <div class="roulette-machine">
+      <div class="reel-window">
+        <div class="reel-pointer reel-pointer-l">▶</div>
+        <div class="reel-strip" id="reel-strip"></div>
+        <div class="reel-pointer reel-pointer-r">◀</div>
+      </div>
+    </div>
+
+    <div class="roulette-result" id="roulette-result" hidden>
+      <div class="result-kicker">🎉 あなたの次の旅先は…</div>
+      <div class="result-name" id="result-name"></div>
+      <div class="result-region" id="result-region"></div>
+      <div class="result-tip" id="result-tip"></div>
+      <div class="result-strip" id="result-strip"></div>
+      <div class="result-actions">
+        <button class="result-btn" id="result-detail">詳細を見る</button>
+        <button class="result-btn" id="result-fav">★ お気に入りに追加</button>
+        <button class="result-btn primary" id="result-again">もう一回まわす</button>
+      </div>
+    </div>
+
+    <div class="roulette-empty" id="roulette-empty" hidden>
+      この条件で◎の地域がありません。月かエリアを変えてみてください。
+    </div>
+  </div>
+</section>
+
+<!-- CALENDAR BLOCK（フィルタバーはこのブロック内でのみ粘着） -->
+<div id="calendar-block">
 
 <!-- FILTER BAR -->
 <nav class="filter-bar" id="filter-bar" aria-label="フィルタ">
@@ -92,6 +142,8 @@
     <p>条件に合う目的地が見つかりませんでした。<br>検索条件やフィルタを変えてみてください。</p>
   </div>
 </main>
+
+</div><!-- /#calendar-block -->
 
 <!-- FOOTER -->
 <footer>
