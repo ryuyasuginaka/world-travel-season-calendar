@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Montserrat:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Bebas+Neue&family=Noto+Serif+JP:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 </head>
 <body>
 
@@ -19,6 +20,7 @@
     <div class="nav-links">
       <a href="#roulette">ルーレット</a>
       <a href="#calendar-block">カレンダー</a>
+      <a href="#map-section">マップ</a>
       <a href="#fav-section">お気に入り</a>
     </div>
   </div>
@@ -145,6 +147,25 @@
 
 </div><!-- /#calendar-block -->
 
+<!-- ROUTE MAP -->
+<section class="map-section" id="map-section">
+  <div class="map-inner">
+    <div class="map-head reveal">
+      <div class="section-label">Route Map</div>
+      <h2>ルートマップ</h2>
+      <div class="accent-line"></div>
+      <p class="map-lead">62地域を世界地図で一望。マーカーの色は選択中の月の評価（緑=◎ / 黄=△ / 赤=×）。★お気に入りに追加した地域は、追加した順にラインで結ばれて周遊ルートになります。</p>
+    </div>
+    <div id="map" class="reveal"></div>
+    <div class="map-note">
+      <span class="map-legend"><i style="background:var(--best-fg)"></i>◎ ベスト</span>
+      <span class="map-legend"><i style="background:var(--good-fg)"></i>△ まずまず</span>
+      <span class="map-legend"><i style="background:var(--avoid-fg)"></i>× 避ける</span>
+      <span class="map-legend"><i class="line-sample"></i>お気に入り周遊ルート</span>
+    </div>
+  </div>
+</section>
+
 <!-- FOOTER -->
 <footer>
   <div class="foot-logo">🧭 SEASON ATLAS</div>
@@ -159,6 +180,7 @@
   <div class="modal" id="modal"></div>
 </div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script src="js/data.js"></script>
 <script src="js/app.js"></script>
 

@@ -126,9 +126,15 @@ function renderFilters() {
 }
 
 // ===================== APPLY FILTERS =====================
-function applyFilters() {
+function destVisible(d) {
   const q = state.query.toLowerCase();
+  let show = state.region === 'all' || d.r === state.region;
+  if (show && q) show = d.n.toLowerCase().includes(q);
+  if (show && state.bestOnly && state.month !== null) show = d.m[state.month][0] === 3;
+  return show;
+}
 
+function applyFilters() {
   renderFavSection(); // 先に再構築（後段の列ハイライトを効かせるため）
 
   // region buttons
@@ -159,10 +165,7 @@ function applyFilters() {
   // rows
   let visibleCount = 0;
   document.querySelectorAll('tr[data-idx]').forEach(tr => {
-    const d = DATA[Number(tr.dataset.idx)];
-    let show = state.region === 'all' || d.r === state.region;
-    if (show && q) show = d.n.toLowerCase().includes(q);
-    if (show && state.bestOnly && state.month !== null) show = d.m[state.month][0] === 3;
+    const show = destVisible(DATA[Number(tr.dataset.idx)]);
     tr.style.display = show ? '' : 'none';
     if (show) visibleCount++;
   });
@@ -177,6 +180,7 @@ function applyFilters() {
 
   renderStats();
   renderRecommend();
+  updateMap();
   syncHash();
 }
 
@@ -433,12 +437,89 @@ function showRouletteResult({ d, i }, m) {
   rouletteResult.hidden = false;
 }
 
+// ===================== ROUTE MAP =====================
+let map = null;
+let mapMarkers = [];
+let favLine = null;
+
+const getCss = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
+function markerColor(rating) {
+  return rating === 3 ? getCss('--best-fg') : rating === 2 ? getCss('--good-fg') : getCss('--avoid-fg');
+}
+
+function mapPopupHtml(d, i, m) {
+  const [r, tip] = d.m[m];
+  const fav = FAVS.has(d.n);
+  return `<div class="map-popup-name">${d.n}</div>
+    <div class="map-popup-status">${m + 1}月: ${SYMBOLS[r]} ${tip}</div>
+    <div class="map-popup-actions">
+      <button data-act="detail" data-i="${i}">詳細を見る</button>
+      <button data-act="fav" data-i="${i}">${fav ? '★ 解除' : '★ お気に入り'}</button>
+    </div>`;
+}
+
+function initMap() {
+  if (typeof L === 'undefined') return; // CDN未達時は地図なしで続行
+  map = L.map('map', { scrollWheelZoom: false, worldCopyJump: true }).setView([22, 15], 2);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom: 10,
+  }).addTo(map);
+
+  DATA.forEach((d, i) => {
+    if (!d.g) return;
+    const mk = L.circleMarker(d.g, { radius: 7, weight: 1.5, color: '#fff', fillOpacity: 0.9 }).addTo(map);
+    mk.bindPopup('');
+    mapMarkers.push({ mk, i });
+  });
+
+  // ポップアップ内ボタン（Leafletのpopupはmapコンテナ内なので委譲で拾う）
+  document.getElementById('map').addEventListener('click', e => {
+    const btn = e.target.closest('[data-act]');
+    if (!btn) return;
+    const i = Number(btn.dataset.i);
+    if (btn.dataset.act === 'detail') openModal(i);
+    if (btn.dataset.act === 'fav') { toggleFav(i); map.closePopup(); }
+  });
+
+  window.addEventListener('load', () => map.invalidateSize());
+  updateMap();
+}
+
+function updateMap() {
+  if (!map) return;
+  const m = state.month !== null ? state.month : new Date().getMonth();
+
+  mapMarkers.forEach(({ mk, i }) => {
+    const d = DATA[i];
+    const visible = destVisible(d);
+    mk.setStyle({
+      fillColor: markerColor(d.m[m][0]),
+      fillOpacity: visible ? 0.9 : 0.2,
+      opacity: visible ? 1 : 0.25,
+    });
+    mk.setPopupContent(mapPopupHtml(d, i, m));
+  });
+
+  // お気に入り周遊ルート（追加順に結ぶ）
+  if (favLine) { favLine.remove(); favLine = null; }
+  const pts = [...FAVS]
+    .map(n => DATA.find(d => d.n === n))
+    .filter(d => d && d.g)
+    .map(d => d.g);
+  if (pts.length >= 2) {
+    favLine = L.polyline(pts, { color: getCss('--terra'), weight: 2.5, dashArray: '6 8' }).addTo(map);
+  }
+}
+
 // ===================== INIT =====================
 document.getElementById('hero-count').textContent = DATA.length;
 document.getElementById('hero-stat-dest').textContent = DATA.length;
 initRoulette();
 renderSections();
 renderFilters();
+initMap();
 if (!loadHash()) {
   state.month = new Date().getMonth(); // 今月を初期ハイライト
 }
