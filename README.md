@@ -21,6 +21,8 @@
 | 🗺️ **ルートマップ** | 世界地図（Leaflet）にプロット。マーカー色は選択月の評価と連動、★お気に入りは追加順に周遊ルート線で結ばれる |
 | 💰 **費用シミュレーター** | 目的地 × 日数 × スタイル（節約⇔快適）で7カテゴリの旅費概算。現地物価Tierと東京発航空券相場から算出 |
 | 🎒 **持ち物リスト** | カテゴリ別チェックリスト + 気候別追加装備（暑い/寒い/雨季）。チェック状態はブラウザに保存 |
+| 🗺️✏️ **モデルプラン** | ヨーロッパ周遊11都市30日の定番ルート（都市別Tips付き）+ 賢く旅する6つのコツ |
+| 📓 **旅の記録** | 実体験ベースのバックパック旅記録（欧州49日 / オセアニア22日）とプロフィール |
 | ⭐ **お気に入り比較** | 気になる地域をピン留めして比較テーブルに集約（localStorage永続化） |
 | 🔗 **URL共有** | フィルタ状態がハッシュに同期（例: `#r=europe&m=10&best=1`）。そのまま共有可能 |
 
@@ -96,3 +98,5 @@ python3 -m http.server 8000   # または任意の静的サーバー
 - コード: [MIT License](LICENSE) © 2026 Ryuya Suginaka
 - ヒーロー写真: [Wolfgang Moroder](https://commons.wikimedia.org/wiki/File:Hot_air_balloon_ride_at_sunrise_in_Cappadocia.JPG)（CC BY-SA 3.0, Wikimedia Commons）
 - 地図: [Leaflet](https://leafletjs.com/) / © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors
+
+> このプロジェクトは [world-trip-roulette](https://github.com/ryuyasuginaka/world-trip-roulette) と [europe-backpack-guide](https://github.com/ryuyasuginaka/europe-backpack-guide) を統合したものです（両リポジトリはアーカイブ済み）。

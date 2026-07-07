@@ -731,6 +731,55 @@ function planTrip(idx, month) {
   emitAtlasEvent('plan:start', { name: d.n, month: month + 1, climates });
 }
 
+// ===================== MODEL PLAN / TIPS / TRIP RECORDS =====================
+function renderModelPlan() {
+  document.getElementById('plan-head').innerHTML = `
+    <div class="section-label">${MODEL_PLAN.label}</div>
+    <h2>${MODEL_PLAN.title}<span style="font-size:0.55em;color:var(--muted)">　${MODEL_PLAN.subtitle}</span></h2>
+    <div class="accent-line"></div>
+    <p class="plan-lead">${MODEL_PLAN.lead}</p>
+    <div class="plan-stats">${MODEL_PLAN.stats.map(s =>
+      `<div class="plan-stat"><span class="num">${s.num}</span><span class="unit">${s.unit}</span></div>`).join('')}
+    </div>`;
+
+  document.getElementById('plan-cities').innerHTML = MODEL_PLAN.cities.map(c => `
+    <div class="city-card">
+      <div class="city-name">${c.emoji} ${c.name}</div>
+      <div class="city-meta">${c.country} — ${c.nights}泊</div>
+      <div class="city-hl">${c.hl.map(h => `<span>${h}</span>`).join('')}</div>
+      <div class="city-tip">${c.tip}</div>
+    </div>`).join('');
+
+  document.getElementById('tips-grid').innerHTML = TRAVEL_TIPS.map(t => `
+    <div class="tip-card">
+      <div class="tip-card-head"><span class="icon">${t.icon}</span><span class="tag">${t.tag}</span></div>
+      <h3>${t.title}</h3>
+      <p>${t.body}</p>
+    </div>`).join('');
+}
+
+function renderTrips() {
+  document.getElementById('trips-grid').innerHTML = TRIP_RECORDS.map(t => `
+    <article class="trip-card">
+      <h3>${t.flag} ${t.title}</h3>
+      <div class="trip-period">${t.period}</div>
+      <p class="trip-summary">${t.summary}</p>
+      <div class="trip-sub">訪問国</div>
+      <div class="trip-countries">${t.countries.map(c => `<span>${c}</span>`).join('')}</div>
+      <div class="trip-sub">ハイライト</div>
+      <ul class="trip-highlights">${t.highlights.map(h => `<li>${h}</li>`).join('')}</ul>
+    </article>`).join('');
+
+  document.getElementById('profile-card').innerHTML = `
+    <div class="profile-photo"><img src="${PROFILE.photo}" alt="${PROFILE.name}のプロフィール写真" loading="lazy"></div>
+    <div class="profile-body">
+      <div class="profile-kicker">${PROFILE.kicker}</div>
+      <div class="profile-name">${PROFILE.name}</div>
+      ${PROFILE.lines.map(l => `<p>${l}</p>`).join('')}
+      <div class="profile-links"><a href="${PROFILE.github}" target="_blank" rel="noopener">GitHub @ryuyasuginaka →</a></div>
+    </div>`;
+}
+
 // ===================== INIT =====================
 document.getElementById('hero-count').textContent = DATA.length;
 document.getElementById('hero-stat-dest').textContent = DATA.length;
@@ -743,6 +792,8 @@ renderFilters();
 initMap();
 initBudget();
 initPacking();
+renderModelPlan();
+renderTrips();
 if (!loadHash()) {
   state.month = new Date().getMonth(); // 今月を初期ハイライト
 }

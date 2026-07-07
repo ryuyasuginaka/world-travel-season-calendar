@@ -9,7 +9,7 @@
 //   （サイト内のリンク・アセット参照はすべて相対パスなので変更不要）
 // =====================================================================
 const SITE_CONFIG = {
-  version: '0.2.0-alpha',
+  version: '0.3.0-alpha',
   name: 'SEASON ATLAS',
   baseUrl: 'https://ryuyasuginaka.github.io/world-travel-season-calendar/',
 };
