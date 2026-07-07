@@ -513,6 +513,77 @@ function updateMap() {
   }
 }
 
+// ===================== BUDGET SIMULATOR =====================
+const BUDGET_CATS = [
+  { key: 'flight', name: '✈️ 航空券（往復）', color: '#7c3d2a' },
+  { key: 'stay', name: '🏨 宿泊費', color: '#c2410c' },
+  { key: 'food', name: '🍽️ 食費', color: '#d97706' },
+  { key: 'trans', name: '🚇 現地交通', color: '#92400e' },
+  { key: 'sight', name: '🎟️ 観光・アクティビティ', color: '#78350f' },
+  { key: 'comm', name: '📱 通信（eSIM）', color: '#a16207' },
+  { key: 'misc', name: '🛍️ 雑費・お土産', color: '#b45309' },
+];
+
+// 現地物価Tier(1-5)ごとの1日あたり基準額（節約スタイル時・円）
+const STAY_BASE = [2000, 3500, 6000, 9500, 14000];
+const FOOD_BASE = [1500, 2500, 3500, 5000, 7000];
+const TRANS_BASE = [500, 800, 1200, 1800, 2500];
+const SIGHT_BASE = [1000, 1500, 2200, 3000, 4000];
+
+function calcBudget(d, days, style) { // style: 0(節約)〜1(快適)
+  const t = d.c - 1;
+  const nights = Math.max(days - 1, 1);
+  const flight = d.f * 10000 * (0.85 + 0.5 * style); // LCC/セール 〜 正規便
+  const stay = STAY_BASE[t] * (1 + 1.6 * style) * nights; // ドミトリー 〜 ホテル
+  const food = FOOD_BASE[t] * (1 + 1.2 * style) * days;
+  const trans = TRANS_BASE[t] * (1 + 1.0 * style) * days;
+  const sight = SIGHT_BASE[t] * (1 + 1.0 * style) * days;
+  const comm = 1000 + 150 * days;
+  const sub = flight + stay + food + trans + sight + comm;
+  const misc = sub * 0.1;
+  return { flight, stay, food, trans, sight, comm, misc, total: sub + misc };
+}
+
+function initBudget() {
+  const destSel = document.getElementById('budget-dest');
+  destSel.innerHTML = REGIONS.map(region =>
+    `<optgroup label="${jpName(region.t)}">` +
+    DATA.map((d, i) => ({ d, i })).filter(({ d }) => d.r === region.k)
+      .map(({ d, i }) => `<option value="${i}">${d.n}</option>`).join('') +
+    `</optgroup>`
+  ).join('');
+  destSel.value = DATA.findIndex(d => d.n.includes('タイ（バンコク）'));
+
+  ['budget-dest', 'budget-days', 'budget-style'].forEach(id =>
+    document.getElementById(id).addEventListener('input', updateBudget));
+  updateBudget();
+}
+
+function updateBudget() {
+  const d = DATA[Number(document.getElementById('budget-dest').value)];
+  const days = Number(document.getElementById('budget-days').value);
+  const style = Number(document.getElementById('budget-style').value) / 100;
+
+  document.getElementById('budget-days-label').textContent = `${days}日間`;
+  document.getElementById('budget-style-label').textContent =
+    style < 0.3 ? '節約バックパッカー' : style < 0.7 ? 'バランス旅行者' : '快適旅行者';
+
+  const b = calcBudget(d, days, style);
+  const man = b.total / 10000;
+  document.getElementById('budget-total').textContent =
+    man >= 100 ? `${Math.round(man)}万円` : `${(Math.round(man * 10) / 10).toFixed(1)}万円`;
+
+  const max = Math.max(...BUDGET_CATS.map(c => b[c.key]));
+  document.getElementById('budget-bars').innerHTML = BUDGET_CATS.map(c => `
+    <div class="budget-bar-row">
+      <div class="bb-head">
+        <span class="bb-name">${c.name}</span>
+        <span class="bb-amount">¥${Math.round(b[c.key]).toLocaleString()}</span>
+      </div>
+      <div class="bb-track"><div class="bb-fill" style="width:${Math.max(2, b[c.key] / max * 100)}%;background:${c.color}"></div></div>
+    </div>`).join('');
+}
+
 // ===================== INIT =====================
 document.getElementById('hero-count').textContent = DATA.length;
 document.getElementById('hero-stat-dest').textContent = DATA.length;
@@ -520,6 +591,7 @@ initRoulette();
 renderSections();
 renderFilters();
 initMap();
+initBudget();
 if (!loadHash()) {
   state.month = new Date().getMonth(); // 今月を初期ハイライト
 }

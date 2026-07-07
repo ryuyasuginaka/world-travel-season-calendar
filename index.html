@@ -21,6 +21,7 @@
       <a href="#roulette">ルーレット</a>
       <a href="#calendar-block">カレンダー</a>
       <a href="#map-section">マップ</a>
+      <a href="#budget-section">費用</a>
       <a href="#fav-section">お気に入り</a>
     </div>
   </div>
@@ -162,6 +163,43 @@
       <span class="map-legend"><i style="background:var(--good-fg)"></i>△ まずまず</span>
       <span class="map-legend"><i style="background:var(--avoid-fg)"></i>× 避ける</span>
       <span class="map-legend"><i class="line-sample"></i>お気に入り周遊ルート</span>
+    </div>
+  </div>
+</section>
+
+<!-- BUDGET SIMULATOR -->
+<section class="budget-section" id="budget-section">
+  <div class="budget-inner">
+    <div class="budget-head reveal">
+      <div class="section-label">Budget Simulator</div>
+      <h2>費用シミュレーター</h2>
+      <div class="accent-line"></div>
+      <p class="budget-lead">目的地・日数・旅のスタイルから、旅行費用の概算を試算します。スライダーを動かして「節約旅」と「快適旅」の差を見てみてください。</p>
+    </div>
+    <div class="budget-grid reveal">
+      <div class="budget-controls">
+        <label class="budget-field">
+          <span class="bf-label">目的地</span>
+          <select id="budget-dest"></select>
+        </label>
+        <label class="budget-field">
+          <span class="bf-label">旅行日数 <b id="budget-days-label">7日間</b></span>
+          <input type="range" id="budget-days" min="3" max="30" value="7">
+        </label>
+        <label class="budget-field">
+          <span class="bf-label">旅のスタイル <b id="budget-style-label">バランス旅行者</b></span>
+          <input type="range" id="budget-style" min="0" max="100" value="50">
+          <div class="style-scale"><span>節約</span><span>快適</span></div>
+        </label>
+      </div>
+      <div class="budget-output">
+        <div class="budget-total">
+          <span class="bt-label">総費用目安</span>
+          <span class="bt-num" id="budget-total">--</span>
+        </div>
+        <div id="budget-bars"></div>
+        <p class="budget-note">※ 東京発の概算です。時期・為替・予約タイミングにより大きく変動します。現地物価Tierと航空券相場から算出した参考値としてご利用ください。</p>
+      </div>
     </div>
   </div>
 </section>
