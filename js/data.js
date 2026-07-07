@@ -76,3 +76,89 @@ const DATA = [
   { r: "oceania", n: "🇬🇺 グアム・サイパン", c: 3, f: 6, g: [13.44, 144.79], m: [[3,"乾季・ベスト"],[3,"乾季・快適"],[3,"乾季・海最高"],[3,"乾季・快適"],[3,"乾季終盤"],[2,"雨季へ移行"],[1,"雨季・台風"],[1,"台風シーズン"],[1,"台風ピーク"],[1,"雨季・台風"],[2,"雨季終盤"],[3,"乾季開始・快適"]] },
   { r: "oceania", n: "🇵🇫 タヒチ・ポリネシア", c: 5, f: 17, g: [-17.55, -149.56], m: [[1,"雨季・蒸し暑い"],[1,"雨季・サイクロン注意"],[1,"雨季"],[2,"乾季へ移行"],[3,"乾季・快適"],[3,"乾季・ベスト"],[3,"乾季・ヘイヴァ祭"],[3,"乾季・ホエールウォッチング"],[3,"乾季・快適"],[2,"乾季終盤"],[1,"雨季開始"],[1,"雨季・蒸し暑い"]] },
 ];
+
+// ===================== 持ち物リスト =====================
+// essential: true=必須 / note: 補足
+const PACKING = [
+  { id: "documents", name: "書類・お金", icon: "📄", items: [
+    { id: "passport", name: "パスポート（残存6ヶ月以上）", essential: true, note: "コピー・スマホ撮影も必ず" },
+    { id: "flight", name: "航空券・予約確認書", essential: true },
+    { id: "insurance", name: "海外旅行保険証書", essential: true, note: "クレカ付帯なら適用条件を確認" },
+    { id: "visa", name: "ビザ・入国許可（要否確認）", essential: true, note: "電子渡航認証（ESTA等）も含む" },
+    { id: "card", name: "クレジットカード2枚以上", essential: true, note: "VISA+Mastercardの組み合わせ推奨" },
+    { id: "cash", name: "現金（現地通貨 or USD/EUR）", essential: true },
+    { id: "copy", name: "重要書類のコピー一式", essential: true },
+    { id: "photos", name: "証明写真2枚", essential: false, note: "ビザ・紛失時の再発行用" },
+  ]},
+  { id: "bags", name: "バッグ・収納", icon: "🎒", items: [
+    { id: "backpack", name: "バックパック（35〜50L）", essential: true, note: "機内持込サイズなら移動が速い" },
+    { id: "daypack", name: "デイパック（折りたたみ可）", essential: true },
+    { id: "moneybelt", name: "マネーベルト・セキュリティポーチ", essential: true },
+    { id: "packingcube", name: "パッキングキューブ・圧縮袋", essential: false },
+    { id: "lock", name: "南京錠・ワイヤーロック", essential: true, note: "ホステルのロッカー用" },
+    { id: "ecobag", name: "エコバッグ", essential: false },
+  ]},
+  { id: "clothes", name: "衣類", icon: "👕", items: [
+    { id: "tshirt", name: "Tシャツ 4〜5枚", essential: true, note: "速乾素材が洗濯に強い" },
+    { id: "longsleeve", name: "長袖シャツ 2枚", essential: true },
+    { id: "pants", name: "パンツ 2〜3本", essential: true },
+    { id: "underwear", name: "下着 5〜7枚", essential: true },
+    { id: "socks", name: "靴下 5〜7足", essential: true },
+    { id: "jacket", name: "軽量ジャケット（防風・防水）", essential: true },
+    { id: "shoes", name: "歩きやすいスニーカー", essential: true },
+    { id: "sandals", name: "サンダル", essential: false, note: "ホステルのシャワーでも活躍" },
+  ]},
+  { id: "electronics", name: "電子機器", icon: "📱", items: [
+    { id: "phone", name: "スマートフォン", essential: true },
+    { id: "esim", name: "eSIM / 周遊SIM", essential: true, note: "日本で事前セットアップ推奨" },
+    { id: "charger", name: "充電器・ケーブル類", essential: true },
+    { id: "powerbank", name: "モバイルバッテリー", essential: true, note: "預け荷物には入れられない" },
+    { id: "adapter", name: "変換プラグ（マルチタイプ）", essential: true },
+    { id: "earphones", name: "イヤホン", essential: false },
+    { id: "camera", name: "カメラ", essential: false },
+  ]},
+  { id: "toiletries", name: "洗面・衛生用品", icon: "🧴", items: [
+    { id: "toothbrush", name: "歯ブラシ・歯磨き粉", essential: true },
+    { id: "soap", name: "シャンプー・ボディソープ（小分け）", essential: true },
+    { id: "towel", name: "速乾タオル", essential: true },
+    { id: "medicine", name: "常備薬（頭痛薬・胃薬・下痢止め）", essential: true },
+    { id: "firstaid", name: "救急セット（絆創膏・消毒）", essential: true },
+    { id: "sanitizer", name: "手指消毒・ウェットティッシュ", essential: false },
+    { id: "contact", name: "コンタクト・メガネ予備", essential: false },
+  ]},
+  { id: "gadgets", name: "便利グッズ", icon: "🔧", items: [
+    { id: "bottle", name: "再利用できる水筒", essential: false },
+    { id: "eyemask", name: "アイマスク・耳栓", essential: true, note: "ドミトリー・夜行移動の必需品" },
+    { id: "neckpillow", name: "ネックピロー", essential: false },
+    { id: "laundry", name: "洗濯ロープ・洗剤シート", essential: false },
+    { id: "ziplock", name: "ジップロック数枚", essential: false, note: "液体物・書類の防水に万能" },
+    { id: "pen", name: "ボールペン", essential: true, note: "入国書類の記入に" },
+  ]},
+];
+
+// 気候別の追加装備
+const PACKING_CLIMATE = [
+  { id: "hot", name: "暑い地域・ビーチ", icon: "☀️", items: [
+    { id: "sunscreen", name: "日焼け止め（SPF50+）", essential: true },
+    { id: "sunglasses", name: "サングラス", essential: true },
+    { id: "hat", name: "帽子", essential: true },
+    { id: "swimwear", name: "水着", essential: false },
+    { id: "repellent", name: "虫除けスプレー", essential: true, note: "蚊媒介感染症の予防にも" },
+    { id: "aftersun", name: "日焼け後ケア（アロエ等）", essential: false },
+  ]},
+  { id: "cold", name: "寒い地域・雪", icon: "❄️", items: [
+    { id: "down", name: "ダウンジャケット", essential: true, note: "圧縮できる軽量タイプ" },
+    { id: "thermal", name: "ヒートテック等インナー上下", essential: true },
+    { id: "gloves", name: "手袋・ニット帽・マフラー", essential: true },
+    { id: "warmer", name: "カイロ", essential: false },
+    { id: "lipcream", name: "リップクリーム・保湿クリーム", essential: true, note: "乾燥対策" },
+    { id: "boots", name: "防水ブーツ・滑り止め", essential: false },
+  ]},
+  { id: "rain", name: "雨季・スコール", icon: "🌧️", items: [
+    { id: "raincoat", name: "レインジャケット", essential: true, note: "傘よりも実用的" },
+    { id: "raincover", name: "バックパック用レインカバー", essential: true },
+    { id: "drybag", name: "防水スタッフサック", essential: false },
+    { id: "quickdry", name: "速乾ウェア多め", essential: false },
+    { id: "waterproofcase", name: "スマホ防水ケース", essential: false },
+  ]},
+];

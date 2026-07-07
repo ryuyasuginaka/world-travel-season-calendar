@@ -584,6 +584,85 @@ function updateBudget() {
     </div>`).join('');
 }
 
+// ===================== PACKING LIST =====================
+const CHECKED = new Set(JSON.parse(localStorage.getItem('wtsc-packing') || '[]'));
+const CLIMATES_ON = new Set(JSON.parse(localStorage.getItem('wtsc-climates') || '[]'));
+let activePackTab = PACKING[0].id;
+
+function saveChecked() { localStorage.setItem('wtsc-packing', JSON.stringify([...CHECKED])); }
+function saveClimates() { localStorage.setItem('wtsc-climates', JSON.stringify([...CLIMATES_ON])); }
+
+function activePackCategories() {
+  return [...PACKING, ...PACKING_CLIMATE.filter(c => CLIMATES_ON.has(c.id))];
+}
+
+function initPacking() {
+  const togglesBox = document.getElementById('climate-toggles');
+  togglesBox.insertAdjacentHTML('beforeend', PACKING_CLIMATE.map(c =>
+    `<button class="climate-btn${CLIMATES_ON.has(c.id) ? ' active' : ''}" data-climate="${c.id}">${c.icon} ${c.name}</button>`
+  ).join(''));
+  togglesBox.querySelectorAll('.climate-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.climate;
+      if (CLIMATES_ON.has(id)) CLIMATES_ON.delete(id); else CLIMATES_ON.add(id);
+      btn.classList.toggle('active', CLIMATES_ON.has(id));
+      saveClimates();
+      if (!activePackCategories().some(c => c.id === activePackTab)) activePackTab = PACKING[0].id;
+      renderPacking();
+    });
+  });
+
+  document.getElementById('packing-reset').addEventListener('click', () => {
+    CHECKED.clear();
+    saveChecked();
+    renderPacking();
+  });
+
+  renderPacking();
+}
+
+function renderPacking() {
+  const cats = activePackCategories();
+
+  // タブ
+  document.getElementById('packing-tabs').innerHTML = cats.map(c => {
+    const done = c.items.filter(i => CHECKED.has(`${c.id}:${i.id}`)).length;
+    return `<button class="packing-tab${c.id === activePackTab ? ' active' : ''}" data-tab="${c.id}">${c.icon} ${c.name}<span class="count">${done}/${c.items.length}</span></button>`;
+  }).join('');
+  document.querySelectorAll('.packing-tab').forEach(btn => {
+    btn.addEventListener('click', () => { activePackTab = btn.dataset.tab; renderPacking(); });
+  });
+
+  // リスト
+  const cat = cats.find(c => c.id === activePackTab) || cats[0];
+  document.getElementById('packing-panel').innerHTML = cat.items.map(item => {
+    const key = `${cat.id}:${item.id}`;
+    const on = CHECKED.has(key);
+    return `<label class="packing-item${on ? ' checked' : ''}">
+      <input type="checkbox" data-key="${key}" ${on ? 'checked' : ''}>
+      <span class="pi-body">
+        <span class="pi-name">${item.name}</span>
+        ${item.note ? `<span class="pi-note">💡 ${item.note}</span>` : ''}
+      </span>
+      ${item.essential ? '<span class="pi-badge">必須</span>' : ''}
+    </label>`;
+  }).join('');
+  document.querySelectorAll('.packing-item input').forEach(cb => {
+    cb.addEventListener('change', () => {
+      if (cb.checked) CHECKED.add(cb.dataset.key); else CHECKED.delete(cb.dataset.key);
+      saveChecked();
+      renderPacking();
+    });
+  });
+
+  // 進捗
+  const total = cats.reduce((s, c) => s + c.items.length, 0);
+  const done = cats.reduce((s, c) => s + c.items.filter(i => CHECKED.has(`${c.id}:${i.id}`)).length, 0);
+  const pct = total ? Math.round(done / total * 100) : 0;
+  document.getElementById('packing-progress-fill').style.width = pct + '%';
+  document.getElementById('packing-progress-label').textContent = `${done} / ${total}（${pct}%）`;
+}
+
 // ===================== INIT =====================
 document.getElementById('hero-count').textContent = DATA.length;
 document.getElementById('hero-stat-dest').textContent = DATA.length;
@@ -592,6 +671,7 @@ renderSections();
 renderFilters();
 initMap();
 initBudget();
+initPacking();
 if (!loadHash()) {
   state.month = new Date().getMonth(); // 今月を初期ハイライト
 }

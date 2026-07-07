@@ -22,7 +22,7 @@
       <a href="#calendar-block">カレンダー</a>
       <a href="#map-section">マップ</a>
       <a href="#budget-section">費用</a>
-      <a href="#fav-section">お気に入り</a>
+      <a href="#packing-section">持ち物</a>
     </div>
   </div>
 </nav>
@@ -201,6 +201,31 @@
         <p class="budget-note">※ 東京発の概算です。時期・為替・予約タイミングにより大きく変動します。現地物価Tierと航空券相場から算出した参考値としてご利用ください。</p>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- PACKING LIST -->
+<section class="packing-section" id="packing-section">
+  <div class="packing-inner">
+    <div class="packing-head reveal">
+      <div class="section-label">Packing List</div>
+      <h2>持ち物リスト</h2>
+      <div class="accent-line"></div>
+      <p class="packing-lead">バックパック旅を想定した基本装備リスト。行き先の気候に合わせて追加装備をONにしてください。チェック状態はこのブラウザに保存されます。</p>
+    </div>
+
+    <div class="packing-progress reveal">
+      <div class="pp-track"><div class="pp-fill" id="packing-progress-fill"></div></div>
+      <div class="pp-label" id="packing-progress-label"></div>
+      <button class="pp-reset" id="packing-reset">リセット</button>
+    </div>
+
+    <div class="climate-toggles reveal" id="climate-toggles">
+      <span class="filter-label">追加装備</span>
+    </div>
+
+    <div class="packing-tabs reveal" id="packing-tabs"></div>
+    <div class="packing-panel reveal" id="packing-panel"></div>
   </div>
 </section>
 
