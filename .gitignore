@@ -17,3 +17,14 @@ dist/
 
 # Claude Code local
 .claude/
+
+# Local publishing output and internal working documents
+.wrangler/
+_site/
+.env
+.env.*
+AGENTS.md
+CLAUDE.md
+HANDOFF.md
+STATUS.md
+docs/reviews/

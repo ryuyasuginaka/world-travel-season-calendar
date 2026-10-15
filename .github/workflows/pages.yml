@@ -25,6 +25,10 @@ jobs:
             echo "checking $f"
             node --check "$f"
           done
+      - name: Validate Cloudflare public build
+        run: |
+          node --test scripts/build-cloudflare.test.mjs
+          node scripts/build-cloudflare.mjs --base-url https://season-atlas.ryuya-suginaka.workers.dev/
 
   deploy:
     needs: validate
@@ -35,8 +39,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
+      - name: Stage public site files only
+        run: |
+          mkdir -p _site
+          cp index.html home.html robots.txt sitemap.xml _site/
+          cp -R css js assets _site/
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'
+          path: '_site'
       - id: deployment
         uses: actions/deploy-pages@v4

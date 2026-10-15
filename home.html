@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="行き先は、まだなくていい。季節、気分、偶然から、次の旅のきっかけを見つける SEASON ATLAS。">
+  <meta name="theme-color" content="#f8f6f2">
+  <title>SEASON ATLAS — 行き先は、まだなくていい。</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Noto+Sans+JP:wght@400;500;600;700&family=Noto+Serif+JP:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/home.css">
+  <script src="js/home.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">本文へ移動する</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="wordmark" href="home.html" aria-label="SEASON ATLAS ホーム">SEASON ATLAS</a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav" hidden><span class="menu-toggle-label">メニュー</span><span class="menu-icon" aria-hidden="true"></span></button>
+      <nav class="primary-nav" id="primary-nav" aria-label="メインナビゲーション">
+        <a href="#discover">旅を見つける</a>
+        <a href="#guides">旅のガイド</a>
+        <a href="index.html#packing-section">旅の準備</a>
+      </nav>
+      <span class="header-note" aria-hidden="true">A LITTLE CURIOSITY, A NEW JOURNEY <span>⟶</span></span>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <img class="hero-image" src="assets/home/hero.jpg" width="1659" height="948" alt="海を見渡すテラスと、ゆっくりと広がる港町のイメージ" fetchpriority="high">
+      <div class="hero-shade"></div>
+      <div class="hero-content wrap">
+        <p class="hero-eyebrow">まだ知らない、旅のきっかけ。</p>
+        <h1 id="hero-title">行き先は、<br>まだなくていい。</h1>
+        <p class="hero-description">行き先も、日程も、<span>これからで大丈夫。</span></p>
+        <a class="button button-light" href="#discover">旅の候補を見つける <span class="arrow" aria-hidden="true">⟶</span></a>
+      </div>
+      <span class="hero-caption">A MOMENT TO WANDER</span>
+    </section>
+
+    <section class="discovery section-warm" id="discover" aria-labelledby="discover-title">
+      <div class="wrap">
+        <div class="section-heading discovery-heading">
+          <div><p class="eyebrow">FIND YOUR FIRST STEP</p><h2 id="discover-title">どこから、<span>旅をはじめよう。</span></h2><p class="section-description">季節・気分・偶然。気になる入口から。</p></div>
+        </div>
+        <div class="entrance-grid">
+          <article class="entrance-card">
+            <a class="entrance-image-link" href="index.html#calendar-block" tabindex="-1" aria-hidden="true"><img src="assets/home/lake.jpg" width="1536" height="1024" alt="" loading="lazy"></a>
+            <div class="entrance-body"><span class="card-number" aria-hidden="true">01 / SEASON</span><h3>季節から探す</h3><p>好きな季節から、旅先を見つける。</p><a class="button button-outline" href="index.html#calendar-block">カレンダーを見る <span class="arrow" aria-hidden="true">⟶</span></a></div>
+          </article>
+          <article class="entrance-card">
+            <a class="entrance-image-link" href="#mood" tabindex="-1" aria-hidden="true"><img class="image-seaside" src="assets/home/hero.jpg" width="1659" height="948" alt="" loading="lazy"></a>
+            <div class="entrance-body"><span class="card-number" aria-hidden="true">02 / MOOD</span><h3>気分から探す</h3><p>海、街歩き、食。いまの気分で。</p><a class="button button-outline" href="#mood">気分を選ぶ <span class="arrow" aria-hidden="true">⟶</span></a></div>
+          </article>
+          <article class="entrance-card">
+            <a class="entrance-image-link" href="index.html#roulette" tabindex="-1" aria-hidden="true"><img src="assets/home/street.jpg" width="1536" height="1024" alt="" loading="lazy"></a>
+            <div class="entrance-body"><span class="card-number" aria-hidden="true">03 / CHANCE</span><h3>偶然にまかせる</h3><p>思いがけない行き先に出会う。</p><a class="button button-outline" href="index.html#roulette">旅ルーレットを回す <span class="arrow" aria-hidden="true">⟶</span></a></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="destinations section-space" id="mood" aria-labelledby="destinations-title">
+      <div class="wrap">
+        <div class="section-heading"><div><p class="eyebrow">PLACES TO FALL FOR</p><h2 id="destinations-title">気になる景色から、<span>次の旅へ。</span></h2></div><p class="section-note">まだ知らない、好きが見つかる。</p></div>
+        <div class="mood-controls" hidden>
+          <div class="mood-filters" role="group" aria-label="いまの気分で旅先候補を絞り込む">
+            <button type="button" data-mood="all" aria-pressed="true">すべて</button>
+            <button type="button" data-mood="sea" aria-pressed="false">海を眺めたい</button>
+            <button type="button" data-mood="town" aria-pressed="false">街を歩きたい</button>
+            <button type="button" data-mood="food" aria-pressed="false">おいしいものを</button>
+            <button type="button" data-mood="nature" aria-pressed="false">自然のなかへ</button>
+          </div>
+          <p class="filter-status" role="status" aria-live="polite" aria-atomic="true">編集室が選んだ、3つの旅先候補。</p>
+        </div>
+        <div class="destination-grid">
+          <a class="destination-card" data-destination="portugal" href="index.html#q=%E3%83%9D%E3%83%AB%E3%83%88%E3%82%AC%E3%83%AB">
+            <div class="destination-image"><img src="assets/home/street.jpg" width="1536" height="1024" alt="あたたかな光が差す、石畳の街並みのイメージ" loading="lazy"></div>
+            <div class="destination-info"><p class="destination-name">ポルトガル <span>PORTUGAL</span></p><h3>路地の先まで、歩いてみる。</h3><span class="destination-arrow" aria-hidden="true">⟶</span></div>
+          </a>
+          <a class="destination-card" data-destination="taiwan" href="index.html#q=%E5%8F%B0%E6%B9%BE">
+            <div class="destination-image"><img src="assets/home/market.jpg" width="1536" height="1024" alt="湯気と料理の香りに包まれる、朝の食堂のイメージ" loading="lazy"></div>
+            <div class="destination-info"><p class="destination-name">台湾 <span>TAIWAN</span></p><h3>朝ごはんを、旅の目的に。</h3><span class="destination-arrow" aria-hidden="true">⟶</span></div>
+          </a>
+          <a class="destination-card" data-destination="swiss" href="index.html#q=%E3%82%B9%E3%82%A4%E3%82%B9">
+            <div class="destination-image"><img src="assets/home/lake.jpg" width="1536" height="1024" alt="山々と湖が広がる、穏やかな風景のイメージ" loading="lazy"></div>
+            <div class="destination-info"><p class="destination-name">スイス（アルプス） <span>SWISS ALPS</span></p><h3>何もしない時間を、予定に。</h3><span class="destination-arrow" aria-hidden="true">⟶</span></div>
+          </a>
+        </div>
+        <p class="empty-message" hidden>この気分に合う候補は、ただいま編集中です。「すべて」から、ほかのきっかけを探してみてください。</p>
+        <p class="destination-footnote">気になる旅先から、季節のカレンダーへ。写真は旅の雰囲気を伝えるイメージです。</p>
+      </div>
+    </section>
+
+    <section class="experiences section-space" aria-labelledby="experiences-title">
+      <div class="wrap">
+        <div class="section-heading"><div><p class="eyebrow">FOLLOW YOUR CURIOSITY</p><h2 id="experiences-title">場所より先に、<span>したいこと。</span></h2></div><p class="section-note">やりたいことから、旅は広がる。</p></div>
+        <div class="experience-grid">
+          <a class="experience-card" href="#mood" data-select-mood="food"><img src="assets/home/market.jpg" width="1536" height="1024" alt="食を通して出会う、見知らぬ街の日常のイメージ" loading="lazy"><div class="experience-copy"><span class="eyebrow">TASTE THE EVERYDAY</span><h3>知らない味に出会う <span class="arrow" aria-hidden="true">⟶</span></h3></div></a>
+          <a class="experience-card" href="index.html#plan-section"><img src="assets/home/train.jpg" width="1536" height="1024" alt="車窓の景色を眺めながら進む、鉄道の旅のイメージ" loading="lazy"><div class="experience-copy"><span class="eyebrow">TAKE THE SCENIC ROUTE</span><h3>移動の時間も、楽しむ <span class="arrow" aria-hidden="true">⟶</span></h3></div></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="guides section-warm section-space" id="guides" aria-labelledby="guides-title">
+      <div class="wrap">
+        <div class="section-heading"><div><p class="eyebrow">MAKE IT A JOURNEY</p><h2 id="guides-title">「行ってみたい」を、<span>旅の計画に。</span></h2></div><p class="section-note">知るほど、旅はきっと楽しくなる。</p></div>
+        <div class="guide-grid">
+          <a class="guide-card" href="index.html#plan-section"><div class="guide-image"><img src="assets/home/train.jpg" width="1536" height="1024" alt="" loading="lazy"></div><div class="guide-copy"><span class="eyebrow">EUROPE / BACKPACKING</span><h3>欧州バックパックガイド</h3><p>ルートを考える</p><span class="arrow" aria-hidden="true">⟶</span></div></a>
+          <a class="guide-card" href="index.html#budget-section"><div class="guide-image"><img src="assets/home/packing.jpg" width="1536" height="1024" alt="" loading="lazy"></div><div class="guide-copy"><span class="eyebrow">BEFORE YOU GO</span><h3>旅の準備をはじめる</h3><p>費用・持ち物・移動を知る</p><span class="arrow" aria-hidden="true">⟶</span></div></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-main"><div class="footer-brand"><a class="wordmark" href="home.html">SEASON ATLAS</a><p>世界を知る、きっかけを。</p></div><nav class="footer-nav" aria-label="サイト情報"><a href="#about" data-dialog="about">このサイトについて</a><a href="#editorial" data-dialog="editorial">情報の選び方</a><a href="#updates" data-dialog="updates">更新方針</a><a href="#advertising" data-dialog="advertising">広告について</a></nav></div>
+      <p class="image-note">掲載写真は AI 生成のイメージです。特定の旅先・施設の実際の景観を保証するものではありません。</p>
+      <div class="site-information" id="site-information">
+        <section id="about"><h2>このサイトについて</h2><p>SEASON ATLAS は、行き先も日程もこれから決めたい人のための、旅のきっかけを集める編集室です。季節、気分、偶然の3つの入口から、旅先の候補を見つけ、具体的な計画へつなげます。</p><p>このホームはローカル確認用のプレビューです。</p></section>
+        <section id="editorial"><h2>情報の選び方</h2><p>ホームの旅先は、既存のシーズンカレンダーに登録された地域から選んでいます。気分の分類とコピーは編集上の提案です。カレンダーの気候情報は目安として使い、計画時には現地の公式情報や予報を確認してください。</p><p>写真はすべて AI 生成のイメージです。実際に撮影した写真や旅行記としては扱っていません。</p></section>
+        <section id="updates"><h2>更新方針</h2><p>旅先の選定理由や情報の出典を確認しながら、内容を見直していきます。季節の傾向と、天気・入国条件・交通など時期によって変わる情報を分けて扱います。</p><p>このプレビューでは、既存のカレンダーデータを更新していません。</p></section>
+        <section id="advertising"><h2>広告について</h2><p>このプレビューには広告・紹介リンクを設置していません。今後、旅行予約サービスやカード紹介などを掲載する場合は、広告・紹介にあたることをリンクの近くに明示します。</p><p>掲載条件や特典は、その時点の公式情報を確認したうえで案内します。</p></section>
+      </div>
+    </div>
+  </footer>
+  <dialog class="information-dialog" aria-labelledby="dialog-title"><div class="dialog-top"><span class="eyebrow">SEASON ATLAS / EDITORIAL NOTE</span><button class="dialog-close" type="button" aria-label="説明を閉じる">閉じる <span aria-hidden="true">×</span></button></div><div class="dialog-content"></div></dialog>
+</body>
+</html>

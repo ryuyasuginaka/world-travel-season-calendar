@@ -794,10 +794,20 @@ initBudget();
 initPacking();
 renderModelPlan();
 renderTrips();
-if (!loadHash()) {
+// Preserve direct section links when entering from the editorial home.
+const sectionIds = ['roulette', 'calendar-block', 'map-section', 'budget-section',
+  'packing-section', 'plan-section', 'tips-section', 'trips-section'];
+const entrySection = sectionIds.includes(location.hash.slice(1))
+  ? document.getElementById(location.hash.slice(1)) : null;
+const hasSharedFilters = loadHash();
+if (!hasSharedFilters) {
   state.month = new Date().getMonth(); // 今月を初期ハイライト
 }
 applyFilters();
 hashSyncEnabled = true;
-syncHash();
+if (!entrySection) syncHash();
 setupReveal();
+const entryTarget = entrySection || (hasSharedFilters && document.getElementById('calendar-block'));
+if (entryTarget) {
+  requestAnimationFrame(() => entryTarget.scrollIntoView({ behavior: 'instant', block: 'start' }));
+}

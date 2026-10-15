@@ -8,9 +8,36 @@
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 ![Status](https://img.shields.io/badge/status-alpha-orange)
 
-**公開URL: https://ryuyasuginaka.github.io/world-travel-season-calendar/**
+**従来の旅行ツール: https://ryuyasuginaka.github.io/world-travel-season-calendar/**
 
 ---
+
+## 旅行ポータルの公開ホーム
+
+「行き先は、まだなくていい。」を入口に、季節・気分・偶然から旅行を探すホームを追加しました。
+写真はAI生成イメージです。カレンダー・旅ルーレット・モデルプラン・旅行準備は既存の旅行ツールへ接続します。
+
+- ソースの `home.html`: 編集室ホーム（ローカル確認用）
+- ソースの `index.html`: 既存の旅行ツールとGitHub Pagesの入口
+- Cloudflare配信時: `/` が編集室ホーム、`/travel` が旅行ツール
+- 本人用ポータルや内部資料はCloudflare配信対象に含めません。過去の個人旅行記・プロフィールも配信用ビルドから除外します。
+
+```bash
+python3 -m http.server 4179 --bind 127.0.0.1
+# http://127.0.0.1:4179/home.html
+```
+
+Cloudflare用の公開ファイルは次のコマンドで `dist/` に生成します（Node.jsが必要、追加のビルド依存なし）。
+
+```bash
+node scripts/build-cloudflare.mjs --base-url https://season-atlas.ryuya-suginaka.workers.dev/
+# 初回はCloudflareへログイン済みのWranglerを使用
+npx wrangler@4.130.0 deploy
+```
+
+公開承認後に実行するコマンドです。`dist/` だけを静的配信し、リポジトリ直下・内部文書・認証情報を配信しません。
+Cloudflareへの更新は明示的なdeployで行います。GitHub pushとCloudflare更新は自動連動していません。
+既存のGitHub Pagesは従来どおり `master` push/手動Actionsで更新されます。
 
 ## ✨ 機能
 
