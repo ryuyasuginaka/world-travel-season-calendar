@@ -1,16 +1,20 @@
-# 🧭 SEASON ATLAS — 世界旅行 ベストシーズンカレンダー
+# 🧭 SEASON ATLAS — 旅のきっかけを見つける旅行ポータル
 
-> **「いつ行くか」で旅は決まる。**
-> 世界62地域のベストシーズンを月別に一覧し、ルーレットで次の旅先と出会うトラベルガイド。
+> **行き先は、まだなくていい。**
+> 季節・気分・偶然から旅を探し、世界62地域のカレンダーと旅ルーレットで計画を具体化する旅行ポータル。
 
 [![Site](https://img.shields.io/badge/site-GitHub_Pages-2ea44f)](https://ryuyasuginaka.github.io/world-travel-season-calendar/)
 [![Deploy](https://github.com/ryuyasuginaka/world-travel-season-calendar/actions/workflows/pages.yml/badge.svg)](https://github.com/ryuyasuginaka/world-travel-season-calendar/actions/workflows/pages.yml)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 ![Status](https://img.shields.io/badge/status-alpha-orange)
 
+**公開ホーム: https://season-atlas.ryuya-suginaka.workers.dev/**
+
 **従来の旅行ツール: https://ryuyasuginaka.github.io/world-travel-season-calendar/**
 
 ---
+
+公開版のコードは `codex/travel-home` ブランチです。既存GitHub Pagesを更新する `master` への取り込みは未実施です。
 
 ## 旅行ポータルの公開ホーム
 
